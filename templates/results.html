@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static',filename='favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ url_for('static',filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap-5.2.0-beta1-dist/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='fontawesome-free-6.1.2-web/css/all.min.css') }}">
+    <title>NT : Results</title>
+    <style>
+        body {
+            background-color: #FFD100;
+        }
+
+        .results {
+            width: 280px;
+            height: 280px;
+            font-size: 5rem;
+            font-weight: bolder;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="row justify-content-between bg-white py-3">
+            <div class="col-4"></div>
+            <div class="col-4 d-flex justify-content-center">
+                <a class="navbar-brand" href="http://research.ntplc.co.th/">
+                    <img src="{{ url_for('static',filename='img/logo.jpg') }}" alt="" width="70" height="45"
+                        class="d-inline-block align-text-top">
+                </a>
+            </div>
+            <div class="col-4 d-flex justify-content-end">
+                <!-- <a class="btn btn-outline-danger mb-3" href="/">คำนวณ</a> &nbsp; -->
+                <div class="dropdown">
+
+                    {% if user['fname'] == "admin" %}
+                    <button class="btn btn-outline-danger dropdown-toggle me-3" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false"><i class="fa-regular fa-circle-user"></i> {{ user['fname'] }}</button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/history"><i class="fa-solid fa-address-book"></i>
+                                DataBase</a></li>
+                        <li><a a class="dropdown-item" href="/select_splitter"><i class="fa-solid fa-wrench"></i> Edit
+                                Spiltter</a></li>
+                        <li><a class="dropdown-item" href="/edit_olt"><i class="fa-solid fa-plug-circle-bolt"></i> Edit
+                                Power OLT</a></li>
+                        <li><a class="dropdown-item" href="/edit_threshold"><i class="fa-solid fa-explosion"></i> Edit
+                                Loss Budget Threshold</a></li>
+                        {% elif user['fname'] != "admin" %}
+                        <button class="btn btn-outline-warning dropdown-toggle me-3" type="button"
+                            data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-regular fa-circle-user"></i> {{
+                            user['fname'] }}</button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/history"><i class="fa-solid fa-address-book"></i>
+                                    History</a></li>
+                            <li><a class="dropdown-item" href="/edit_profile"><i class="fa-solid fa-user-pen"></i> Edit
+                                    Profile</a></li>
+                            {% endif %}
+                            <li><a class="dropdown-item" href="/logout"><i
+                                        class="fa-solid fa-arrow-right-from-bracket"></i> Logout </a></li>
+                        </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="row my-5 p-3">
+            <div class="col-8 border rounded rounded-4 shadow mx-auto bg-white justify-content-center">
+                <h1 class="text-center mt-5 mb-3" style="font-size: 3rem;">สรุปผล</h1>
+                {% set loss = projects['loss_budget'] | int %}
+                {% set pass = threshold['threshold_success'] | int %}
+                {% set warning = threshold['threshold_warning'] | int %}
+                {% set danger = threshold['threshold_danger'] | int %}
+
+                {% if loss > warning and loss <= pass %} <div class="d-flex justify-content-center">
+                    <button
+                        class="results border border-success border-4 rounded-circle my-3 text-center text-success bg-white">
+                        {{ projects['loss_budget'] }}
+                    </button>
+            </div>
+            <h3 class="text-center my-3">*** Detail ***</h3>
+            <p class="text-center my-3">สามารถใช้งานได้..</p>
+
+            <div class="d-grid gap-2 col-6 mx-auto">
+                <a class="text-center btn btn-success mb-3 btn-lg" href="/history">ประวัติการคำนวณ</a>
+            </div>
+
+            {% elif loss > danger and loss <= warning %} <div class="d-flex justify-content-center">
+                <button
+                    class="results border border-warning border-4 rounded-circle my-3 text-center text-warning bg-white">
+                    {{ projects['loss_budget'] }}
+                </button>
+        </div>
+        <h3 class="text-center my-3">*** Detail ***</h3>
+        <p class="text-center my-3">สามารถใช้งานได้ (Warning)..</p>
+        <div class="d-grid gap-2 col-6 mx-auto">
+            <a class="text-center btn btn-success mb-3 btn-lg" href="/history">ประวัติการคำนวณ</a>
+        </div>
+        {% else %}
+        <div class="d-flex justify-content-center">
+            <button class="results border border-danger border-4 rounded-circle my-3 text-center text-danger bg-white">
+                {{ projects['loss_budget'] }}
+            </button>
+        </div>
+        <h3 class="text-center my-3">*** Detail ***</h3>
+        <p class="text-center my-3">ไม่สามารถใช้งานได้..โปรดแก้ไข</p>
+        <div class="d-flex justify-content-center">
+            <h1>{{ threshold['threshold_success'] }} | {{ projects['loss_budget'] }}</h1>
+
+            <a class="text-center btn btn-danger mb-3 btn-lg" onclick="history.back()">คำนวณอีกครั้ง</a> &nbsp;
+            <a class="text-center btn btn-success mb-3 btn-lg" href="/history">ประวัติการคำนวณ</a>
+        </div>
+        {% endif %}
+    </div>
+    </div>
+    </div>
+
+
+    <script src="{{ url_for('static',filename='bootstrap-5.2.0-beta1-dist/js/bootstrap.bundle.min.js') }}"></script>
+</body>
+
+</html>

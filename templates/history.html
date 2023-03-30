@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static',filename='favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ url_for('static',filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap-5.2.0-beta1-dist/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='fontawesome-free-6.1.2-web/css/all.min.css') }}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}">
+
+
+    <!-- <script>
+        function autoRefresh() {
+            window.location = window.location.href;
+        }
+        setInterval('autoRefresh()', 5000);
+    </script> -->
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+    <title>BFT : History</title>
+    <style>
+        /* body {
+            background-color: #FFD100;
+        }*/
+        h1 {
+            text-align: center;
+        }
+
+        div {
+            text-align: center;
+        } 
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="row justify-content-between bg-white py-3">
+            <div class="col-4"></div>
+            <div class="col-4 d-flex justify-content-center">
+                <a class="navbar-brand" href="http://research.ntplc.co.th/">
+                    <img src="{{ url_for('static',filename='img/logo.jpg') }}" alt="" width="80" height="55"
+                        class="d-inline-block align-text-top">
+                </a>
+            </div>
+            <div class="col-4 d-flex justify-content-end">
+                <div class="dropdown">
+                    <button class="btn btn-outline-warning dropdown-toggle me-3" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false"><i class="fa-regular fa-circle-user"></i> {{ user['fname'] }}</button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/map"><i class="fa-solid fa-magnifying-glass-chart"></i>
+                                Calculate Loss</a></li>
+                        <li><a class="dropdown-item" href="/edit_profile"><i class="fa-solid fa-user-pen"></i> Edit
+                                Profile</a></li>
+                        <li><a class="dropdown-item" href="/logout"><i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col-auto mx-auto my-5 p-3  border rounded rounded-4 shadow bg-white">
+
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                {% for messages in messages %}
+                {% if messages == '✔️ Delete is Complete' %}
+                <div class="alert alert-success mt-3" role="alert">
+                    {{ messages }}
+                </div>
+                {% elif messages == '⚠️ Your rights are inaccessible.' %}
+                <div class="alert alert-warning mt-3" role="alert">
+                    {{ messages }}
+                </div>
+                {% else %}
+                <div class="alert alert-danger mt-3" role="alert">
+                    {{ messages }}
+                </div>
+                {% endif %}
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+                <br>
+                <div class="text-light bg-warning shadow rounded-2 " style="font-size: 3.5em;">
+                    History
+                </div><br>
+                <div class="table-responsive">
+                    <table id="table" class="display table table-striped" style="width:100%">
+
+                        <thead>
+                            <tr>
+                                <th>Seq</th>
+                                <th>DateTime</th>
+                                <th>Project Name</th>
+                                <th>Loss Budget (dBm.)</th>
+                                <th>Creator Name</th>
+                                <th>Position</th>
+                                <th>OLT Power(dB.)</th>
+                                <th>Distance (Km.)</th>
+                                <th>Connector (Point.)</th>
+                                <th>Splice (Point.)</th>
+                                <th>spitter</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for project in projects %}
+                            {% set loss = project['loss_budget'] | int %}
+                            {% set pass = threshold['threshold_success'] | int %}
+                            {% set warning = threshold['threshold_warning'] | int %}
+                            {% set danger = threshold['threshold_danger'] | int %}
+
+                            <tr>
+                                <td><strong>{{ project['project_id'] }}</strong></td>
+                                <td>{{ project['project_dt'] }}</td>
+                                <td>{{ project['project_name'] }}</td>
+                                {% if loss > warning and loss <= pass %} <td>
+                                    <div class="text-success text-center">
+                                        <strong>{{ project['loss_budget'] }}</strong>
+                                    </div>
+                                    </td>
+                                    {% elif loss > danger and loss <= warning %} <td>
+                                        <div class="text-warning text-center">
+                                            <strong>{{ project['loss_budget'] }}</strong>
+                                        </div>
+                                        </td>
+                                        {% else %}
+                                        <td>
+                                            <div class="text-danger text-center">
+                                                <strong>{{ project['loss_budget'] }}</strong>
+                                            </div>
+                                        </td>
+                                        {% endif %}
+                                        <td>{{ project['fname'] }}</td>
+                                        <td>{{ project['position'] }}</td>
+                                        <td>+{{ project['olt_power'] }}</td>
+                                        <td>{{ project['distance'] }}</td>
+                                        <td>{{ project['connector'] }}</td>
+                                        <td>{{ project['splice'] }}</td>
+                                        <td>{{ project['splitter'] }}</td>
+
+                                        <td><a class="btn btn-outline-danger mb-3"
+                                                href="/delete_project/{{ project['project_id'] }}"><i
+                                                    class="fa-solid fa-trash"></i></a></td>
+                            </tr>
+                            {% endfor %}
+                            
+                    </table>
+                   
+                </div><br><a href="/threshold">
+                <div class="row justify-content-end">
+                    <div class="col-1 text-success text-center">
+                        <strong>X</strong>
+                        <div class="lable">ผ่าน</div>
+                    </div>
+                    <div class="col-1 text-warning text-center">
+                        <strong>X</strong>
+                        <div class="lable">เตือน</div>
+                    </div>
+                    <div class="col-1 text-danger text-center">
+                        <strong>X</strong>
+                        <div class="lable">ไม่ผ่าน</div>
+                    </div>                
+                </div></a>
+                <br>
+                <!-- <a class="btn btn-outline-danger mb-3" href="/">↵ BACK</a> -->
+                <a class="btn btn-outline-success mb-3" href="/map">+ ADD</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static',filename='bootstrap-5.2.0-beta1-dist/js/bootstrap.bundle.min.js') }}"></script>
+    <script>
+        $(document).ready(function () {
+            $('#table').DataTable({ order: [[0, 'desc']], });
+
+        });
+    </script>
+</body>
+
+</html>

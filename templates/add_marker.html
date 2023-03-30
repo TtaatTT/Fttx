@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static',filename='favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ url_for('static',filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap-5.2.0-beta1-dist/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='fontawesome-free-6.1.2-web/css/all.min.css') }}">
+    <!-- <script>
+        function autoRefresh() {
+            window.location = window.location.href;
+        }
+        setInterval('autoRefresh()', 5000);
+    </script> -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    
+     <script>
+        const process = { env: {} };
+        process.env.GOOGLE_MAPS_API_KEY =
+            "AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg";
+    </script> 
+    <title>Add Marker</title>
+</head>
+<style>
+    #map {
+        height: 400px;
+        width: 100%;
+    }
+
+    .center {
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 20% 0;
+        overflow: auto;
+    }
+</style>
+
+<body class="p-3 m-0 border-0 bd-example bd-example-row">
+    <header>
+        <div class="nav navbar-nav">
+            <div class="row justify-content-between bg-white py-3 ">
+                <div class="col-4"></div>
+                <div class="col-4 d-flex justify-content-center">
+                    <a class="navbar-brand" href="/">
+                        <img src="{{ url_for('static',filename='img/logo.jpg') }}" alt="" width="80" height="55"
+                            class="d-inline-block align-text-top">
+                    </a>
+                </div>
+
+                <div class="col-4 d-flex justify-content-end">
+
+                    <div class="dropdown">
+                        <button class="btn btn-outline-warning dropdown-toggle me-3" type="button"
+                            data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-regular fa-circle-user"></i> {{
+                            user['fname'] }}</button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/map"><i class="fa-solid fa-magnifying-glass-chart"></i>
+                                    Calculate Loss</a></li>
+                            <li><a class="dropdown-item" href="/edit_profile"><i class="fa-solid fa-user-pen"></i> Edit
+                                    Profile</a></li>
+                            <li><a class="dropdown-item" href="/logout"><i
+                                        class="fa-solid fa-arrow-right-from-bracket"></i>
+                                    Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div id="container">
+        <div class="row  g-0 text-center">
+            <h1 class="text-center">Add Marker</h1>
+            <div class="col-sm-6 col-md-9">
+                <div id="map"></div>
+            </div>
+
+            <div class="col-12 col-md-3">
+                <form action="/add_marker" method="post" id="formLoss">
+                    <div class="center">
+                        <h4>รายละเอียดของที่ตั้ง</h4><br><br>
+                        <label for="location">location :</label>
+                        <input type="text" name="location" id="location"  readonly><br>
+                        <input type="hidden" name="lat" id="lat">
+                        <input type="hidden" name="lng" id="lng">
+
+                        <label for="splts">Spiltter :</label>
+                        <input list="splts" name="splt" id="splt"><br>
+
+                        <datalist id="splts">
+                            {% for splt in splts %}
+                            <option value="{{ splt['splitter_id'] }}">{{ splt['splitter_type'] }}</option>
+                            {% endfor %}
+                        </datalist>
+
+                        <label for="marker_name">name :</label>
+                        <input type="text" name="marker_name" id="marker_name"><br>
+                        <button id="btnSubmit">บันทึก</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static',filename='bootstrap-5.2.0-beta1-dist/js/bootstrap.bundle.min.js') }}"></script>
+    
+     <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDdJjxsRSzyYb0sUEdce9GLPZqqTOKohmw&libraries=geometry&callback=initMap&v=weekly"
+        defer>
+    </script>
+    <script>
+        function initMap() {
+            const pathumthani = {
+                lat: 14.020495084837725,
+                lng: 100.52805764451331
+            };
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 13,
+                center: pathumthani,
+                gestureHandling: "none",
+            });
+            // Create the initial InfoWindow.
+            /*let infoWindow = new google.maps.InfoWindow({
+              content: "Click the map to get Lat/Lng!",
+              position: myLatlng,
+            });
+          
+            infoWindow.open(map);*/
+
+            let marker = new google.maps.Marker({
+                // position: pathumthani,
+                // map,
+                // title: "Click to zoom",
+                // draggable: true,
+            });
+
+            // Configure the click listener.
+            map.addListener("click", (mapsMouseEvent) => {
+                // Close the current InfoWindow.
+                /*infoWindow.close();
+                // Create a new InfoWindow.
+                infoWindow = new google.maps.InfoWindow({
+                  position: mapsMouseEvent.latLng,
+                });
+                infoWindow.setContent(
+                  JSON.stringify(mapsMouseEvent.latLng.toJSON(), null, 2)
+                );
+                infoWindow.open(map);*/
+                marker.setMap(null);
+
+                let myClick = JSON.stringify(mapsMouseEvent.latLng.toJSON())
+                console.log(myClick);
+
+                marker = new google.maps.Marker({
+                    position: mapsMouseEvent.latLng,
+                    draggable: true,
+                });
+
+                marker.setMap(map);
+                console.log(mapsMouseEvent.latLng.toString())
+                document.getElementById('lat').value = mapsMouseEvent.latLng.lat();
+                document.getElementById('lng').value = mapsMouseEvent.latLng.lng();
+                document.getElementById('location').value = mapsMouseEvent.latLng.toString();
+
+                // document.getElementById('getpos').addEventListener('click', (event) => {
+                //   console.log("get pos", marker.getPosition())
+                //   console.log("toString", marker.getPosition().toString())
+                //   console.log("toJson", marker.getPosition().toJSON())
+                //   console.log("lat", marker.getPosition().lat(), mapsMouseEvent.latLng.lat())
+                //   console.log("lng", marker.getPosition().lng(), )
+
+                // });
+
+
+            });
+        }
+
+
+        window.initMap = initMap;
+    </script>
+    <script>
+        // กดส่งที่นี่จ้าาาาาาาาาาาาาาาา
+        document.getElementById('btnSubmit').addEventListener('click', function (event) {
+            event.preventDefault();
+
+            // test ผลลัพธ์น้าาาา
+            let lat = document.getElementById('lat').value;
+            let lng = document.getElementById('lng').value;
+            let name = document.getElementById('marker_name').value;
+            let splt = document.getElementById('splt').value;
+
+            console.log("Lat :", lat);
+            console.log("Lng :", lng);
+            console.log("Marker Name :", name);
+            console.log("Splitte ID :", splt);
+            // ส่งไปจริงๆละนะ..
+            document.getElementById('formLoss').submit();
+
+
+        });
+    </script>
+</body>
+
+</html>

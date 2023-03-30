@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static',filename='favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ url_for('static',filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap-5.2.0-beta1-dist/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}">
+    <title>Sign In</title>
+</head>
+<body>
+    <header>
+        <div class="row justify-content-center py-3 mx-2">
+            <div class="col-12">
+                <div class="d-flex justify-content-start">
+                    <a class="navbar-brand" href="http://research.ntplc.co.th/">
+                        <img src="{{ url_for('static',filename='img/logo.png') }}" alt="" width="80" height="55"
+                            class="d-inline-block align-text-top">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="row my-5 ">
+            <h1 class="text-dark text-center p-3">SIGN IN</h1>
+
+            <div class="col-6 mx-auto p-5 border shadow rounded-4 bg-white">
+                <form action="/login" method="post">
+                    <div class="row mb-3 my-5">
+                        <div class="col-2"></div>
+                        <div class="col-3">
+                            <label for="inputEmail" class="form-label">Email </label>
+                        </div>
+                        <div class="col-6">
+                            <input type="text" class="form-control rounded-pill shadow-sm bg-purple"  name="inputEmail"
+                                id="inputEmail" required autofocus autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-2"></div>
+                        <div class="col-3">
+                            <label for="inputPassword" class="form-label">Password </label>
+                        </div>
+                        <div class="col-6">
+                            <input type="password" class="form-control rounded-pill bg-purple shadow-sm" name="inputPassword" id="inputPassword">
+                            <div class="form-check">
+                                <div class="my-2">
+                                    <input type="checkbox" class="form-check-input" id="hidePass" checked> 
+                                    <label class="form-check-label" for="flexCheckDefault">Hide Password</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div><br>
+                    <div class="d-grid gap-2 col-4 mx-auto">
+                        <button type="submit" class="btn-purple w-100 rounded-pill">Sign In</button>
+                    </div>
+
+                    <div class="row text-center my-3">
+                        <p>Already a member ?
+                            <a href="/register" class="btn-link link-purple pe-auto">SignUp</a>
+                        </p>
+                    </div>
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                    {% for messages in messages %}
+                    {% if messages == '⚠️ Wrong Email or Password !!' or messages == '⚠️ Please login !!' %}
+                    <div class="alert alert-warning mt-3" role="alert">
+                        {{ messages }}
+                    </div> 
+                    {% elif messages == '❌ Only Authorized Persons' %}
+                    <div class="alert alert-danger mt-3" role="alert">
+                        {{ messages }}
+                    </div>                     
+                    {% else %}
+                    <div class="alert alert-success mt-3" role="alert">
+                        {{ messages }}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static',filename='bootstrap-5.2.0-beta1-dist/js/bootstrap.bundle.min.js') }}"></script>
+    <script>
+        document.getElementById('hidePass').addEventListener('change', function (event) {
+            event.preventDefault();
+            let pw = document.getElementById("inputPassword");
+            (pw.type === "password") ? pw.type = "text" : pw.type = "password";
+        });
+    </script>
+
+</body>
+</html>

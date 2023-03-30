@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static',filename='favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ url_for('static',filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap-5.2.0-beta1-dist/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='fontawesome-free-6.1.2-web/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}">
+
+
+    <title>Admin</title>
+</head>
+<style>
+    .btn-menu {
+        height: 100px;
+        font-size: 1.25rem;
+        background-color: #8009ff;
+        color: whitesmoke;
+        border-radius: 10px;
+        margin: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+    }
+</style>
+
+<body>
+    <!-- start nav -->
+    <div class="container-fluid">
+        <div class="row flex-nowrap">
+            <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
+                <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
+                    <a href="/"
+                        class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                        <span class="fs-5 d-none d-sm-inline py-1">
+                            <h2>ADMIN</h2>
+                        </span>
+                    </a>
+                    <hr class="dropdown-divider">
+                    <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start"
+                        id="menu">
+                        <li class="nav-item">
+                            <a href="/" class="nav-link align-middle px-auto active" aria-current="page">
+                                <i class="fa-solid fa-house"></i> <span class="ms-1 d-none d-sm-inline">Home</span>
+                            </a>
+                        </li>
+                        <!-- <li>
+                            <a href="#" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
+                                <i class="fa-solid fa-user-plus"></i> <span class="ms-1 d-none d-sm-inline">ผู้ใช้งาน</span> </a>
+                            <ul class="collapse show nav flex-column ms-1" id="submenu1" data-bs-parent="#menu">
+                                <li class="w-100">
+                                    <a href="/register" class="nav-link px-0"> <span class="d-none d-sm-inline">เพิ่มผู้ใช้งาน</span><i class="fa-solid fa-user-plus"></i></a>
+                                </li>
+                                <li>
+                                    <a href="/add_role" class="nav-link px-0"> <span class="d-none d-sm-inline">กำหนดสิทธิ์ผู้ใช้งาน</span><i class="fa-sharp fa-solid fa-person-circle-check"></i></a>
+                                </li>
+                            </ul>
+                        </li> -->
+                        <li>
+                            <a href="/loss_threshold" class="nav-link px-0 align-middle ">
+                                <i class="fa-solid fa-chart-simple"></i> <span
+                                    class="ms-1 d-none d-sm-inline">เกณฑ์ค่ามาตรฐาน</span></a>
+                        </li>
+                        <li>
+                            <a href="/olt_power" class="nav-link px-0 align-middle">
+                                <i class="fa-solid fa-bolt"></i> <span class="ms-1 d-none d-sm-inline">olt power</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#submenu2" data-bs-toggle="collapse" class="nav-link px-0 align-middle ">
+                                <i class="fa-solid fa-users"></i> <span
+                                    class="ms-1 d-none d-sm-inline">ผู้ใช้งาน</span></a>
+                            <ul class="collapse nav flex-column ms-1 align-items-center" id="submenu2"
+                                data-bs-parent="#menu">
+                                <li class="w-100">
+                                    <a href="/register" class="nav-link px-0"> <i
+                                            class="fa-solid fa-user-plus"></i><span class="d-none d-sm-inline">
+                                            เพิ่มผู้ใช้งาน</span></a>
+                                </li>
+                                <li class="w-100">
+                                    <a href="/add_role" class="nav-link px-0"> <i
+                                            class="fa-solid fa-user-gear"></i><span class="d-none d-sm-inline">
+                                            กำหนดสิทธิ์ผู้ใช้งาน</span></a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#submenu3" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
+                                <i class="fa-solid fa-sitemap"></i> <span
+                                    class="ms-1 d-none d-sm-inline">Splitter</span> </a>
+                            <ul class="collapse nav flex-column ms-1 align-items-center" id="submenu3"
+                                data-bs-parent="#menu">
+                                <li class="w-100">
+                                    <a href="/select_splitter" class="nav-link px-0"> <i class="fa-solid fa-pen"></i>
+                                        <span class="d-none d-sm-inline">Edit</span> </a>
+                                </li>
+                                <li class="w-100">
+                                    <a href="/add_splitter" class="nav-link px-0"> <i class="fa-solid fa-plus"></i>
+                                        <span class="d-none d-sm-inline">Add</span></a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="#submenu4" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
+                                <i class="fa-solid fa-map-location-dot"></i> <span
+                                    class="ms-1 d-none d-sm-inline">Marker</span> </a>
+                            <ul class="collapse nav flex-column ms-1 align-items-center" id="submenu4"
+                                data-bs-parent="#menu">
+                                <li class="w-100">
+                                    <a href="/select_marker" class="nav-link px-0"> <i
+                                            class="fa-solid fa-compass-drafting"></i> <span
+                                            class="d-none d-sm-inline">Edit</span> </a>
+                                </li>
+                                <li class="w-100">
+                                    <a href="/add_marker" class="nav-link px-0"> <i class="fa-solid fa-plus"></i> <span
+                                            class="d-none d-sm-inline">Add</span></a>
+                                </li>
+                            </ul>
+                        </li>
+
+
+                    </ul>
+                    <hr class="dropdown-divider">
+                    <div class="dropdown pb-4">
+                        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+                            id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                            <!-- <img src="https://github.com/mdo.png" alt="hugenerd" width="30" height="30" class="rounded-circle"> -->
+                            <i class="fa-solid fa-user-gear"></i>
+                            <span class="d-none d-sm-inline mx-1">{{ user['fname'] }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                            <li><a class="dropdown-item" href="/map">New project...</a></li>
+                            <li><a class="dropdown-item" href="#">Settings</a></li>
+                            <li><a class="dropdown-item" href="#">Profile</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- end nav -->
+
+
+            <div class="col py-3">
+                <div class="row justify-content-between">
+                    <div class="col-auto mr-auto">
+                        <h3>ยินดีต้อนรับ {{ user['fname'] }}</h3>
+                    </div>
+                    <div class="col-auto">
+                        <a class="" href="/logout">
+                            <h3>Logout</h3>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row justify-content-around text-center py-5">
+                    <div class="col-12 col-md-6 col-lg-4 ">
+                        <a href="/loss_threshold" class="nav-link px-auto align-center btn-menu nav-sky">
+                            <i class="fa-solid fa-chart-simple"></i>&nbsp;เกณฑ์ค่ามาตรฐาน</a>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-4 ">
+                        <a href="/olt_power" class="nav-link px-0 align-middle btn-menu">
+                            <i class="fa-solid fa-bolt"></i>&nbsp;olt power
+                        </a>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-4 ">
+                        <a href="/register" class="nav-link px-0 btn-menu"> <i class="fa-solid fa-user-plus"></i
+                                class="d-none d-sm-inline">&nbsp;
+                            เพิ่มผู้ใช้งาน</a>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-4 ">
+                        <a href="/add_role" class="nav-link px-0 btn-menu"> <i class="fa-solid fa-user-gear"></i
+                                class="d-none d-sm-inline">&nbsp;
+                            กำหนดสิทธิ์ผู้ใช้งาน</a>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-4 ">
+                        <a href="/select_splitter" class="nav-link px-0 btn-menu"> <i class="fa-solid fa-pen"></i>&nbsp;
+                            Edit Spiltter </a>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-4 ">
+                        <a href="/add_splitter" class="nav-link px-0 btn-menu"> <i class="fa-solid fa-plus"></i>&nbsp;
+                            Add Spiltter</a>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-lg-6 ">
+                        <a href="/select_marker" class="nav-link px-0 btn-menu"> <i
+                                class="fa-solid fa-compass-drafting"></i>&nbsp;
+                            Edit Marker </a>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-6 ">
+                        <a href="/add_marker" class="nav-link px-0 btn-menu"> <i class="fa-solid fa-plus"></i>&nbsp;
+                            Add Marker</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="d-flex flex-column flex-shrink-0 p-4 text-bg-dark" style="width: 280px;">
+        <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+            <svg class="bi pe-none me-2" width="30" height="32">
+                <use xlink:href="#bootstrap"></use>
+            </svg>
+            <span class="fs-4">ADMIN</span>
+        </a>
+        <hr>
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-item">
+                <a href="/" class="nav-link active" aria-current="page">
+                    <svg class="bi pe-none me-2" width="16" height="16">
+                        <use xlink:href="#home"></use>
+                    </svg>
+                    Home
+                </a>
+            </li>
+            <li>
+                <a href="/register" class="nav-link text-white">
+                    <svg class="bi pe-none me-2" width="16" height="16">
+                        <use xlink:href="#speedometer2"></use>
+                    </svg>
+                    เพิ่มผู้ใช้งาน
+                </a>
+            </li>
+            <li>
+                <a href="/add_role" class="nav-link text-white">
+                    <svg class="bi pe-none me-2" width="16" height="16">
+                        <use xlink:href="#table"></use>
+                    </svg>
+                    กำหนดสิทธิ์ผู้ใช้งาน
+                </a>
+            </li>
+            <li>
+                <a href="/select_splitter" class="nav-link text-white">
+                    <svg class="bi pe-none me-2" width="16" height="16">
+                        <use xlink:href="#grid"></use>
+                    </svg>
+                    แก้ไข Splitter
+                </a>
+            </li>
+            <li>
+                <a href="/loss_threshold" class="nav-link text-white">
+                    <svg class="bi pe-none me-2" width="16" height="16">
+                        <use xlink:href="#people-circle"></use>
+                    </svg>
+                    แก้ไข loss threshold
+                </a>
+            </li>
+            <li>
+                <a href="/olt_power" class="nav-link text-white">
+                    <svg class="bi pe-none me-2" width="16" height="16">
+                        <use xlink:href="#people-circle"></use>
+                    </svg>
+                    แก้ไข olt power
+                </a>
+            </li>
+            <li>
+                <a href="/select_marker" class="nav-link text-white">
+                    <svg class="bi pe-none me-2" width="16" height="16">
+                        <use xlink:href="#people-circle"></use>
+                    </svg>
+                    แก้ไข marker
+                </a>
+            </li>
+        </ul>
+            <hr>
+            <div class="dropdown">
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
+                    <strong>mdo</strong>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                    <li><a class="dropdown-item" href="#">New project...</a></li>
+                    <li><a class="dropdown-item" href="#">Settings</a></li>
+                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="#">Sign out</a></li> <i class="fa-solid fa-map-pin"></i> <i class="fa-solid fa-map-location-dot"></i>
+                </ul>
+            </div>
+    </div> -->
+
+
+        <!-- <h1>ADMIN</h1> -->
+        <!-- <a href="/register">เพิ่มผู้ใช้งาน</a><br> -->
+        <!-- <a href="/add_role">กำหนดสิทธิ์ผู้ใช้งาน</a><br> -->
+        <!-- <a href="/select_splitter">แก้ไข Splitter</a><br>     -->
+        <!-- <a href="/loss_threshold">แก้ไข loss threshold</a><br> -->
+        <!-- <a href="/olt_power">แก้ไข olt power</a><br> -->
+        <!-- <a href="/select_marker">แก้ไข marker</a> <i class="fa-solid fa-marker"></i> -->
+        <script src="{{ url_for('static',filename='bootstrap-5.2.0-beta1-dist/js/bootstrap.bundle.min.js') }}"></script>
+
+</body>
+
+</html>

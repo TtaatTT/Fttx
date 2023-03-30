@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static',filename='favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ url_for('static',filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap-5.2.0-beta1-dist/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='fontawesome-free-6.1.2-web/css/all.min.css') }}">
+    <title>BFT : Select Budget Threshold</title>
+    <style>
+        body {
+            background-color: #b2b2b2;
+        }
+
+        .results {
+            width: 280px;
+            height: 280px;
+            font-size: 5rem;
+            font-weight: bolder;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        div.container {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row flex-nowrap">
+            <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
+                <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
+                    <a href="/" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                        <span class="fs-5 d-none d-sm-inline py-1"><h2>ADMIN</h2></span>
+                    </a>
+                    <hr class="dropdown-divider">
+                    <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
+                        <li class="nav-item">
+                            <a href="/" class="nav-link align-middle px-0" aria-current="page">
+                                <i class="fa-solid fa-house"></i> <span class="ms-1 d-none d-sm-inline">Home</span>
+                            </a>
+                        </li>
+                        <li class="w-100">
+                            <a href="/loss_threshold" class="nav-link px-auto align-middle active">
+                                <i class="fa-solid fa-chart-simple"></i> <span class="ms-1 d-none d-sm-inline">เกณฑ์ค่ามาตรฐาน</span></a>
+                        </li>
+                        <li>
+                            <a href="/olt_power" class="nav-link px-0 align-middle">
+                                <i class="fa-solid fa-bolt"></i> <span class="ms-1 d-none d-sm-inline">olt power</span> </a>
+                        </li>
+                        <li>
+                            <a href="#submenu2" data-bs-toggle="collapse" class="nav-link px-0 align-middle ">
+                                <i class="fa-solid fa-users"></i> <span class="ms-1 d-none d-sm-inline">ผู้ใช้งาน</span></a>
+                            <ul class="collapse nav flex-column ms-1 align-items-center" id="submenu2" data-bs-parent="#menu">
+                                <li class="w-100 text-center">
+                                    <a href="/register" class="nav-link px-0"> <i class="fa-solid fa-user-plus"></i><span class="d-none d-sm-inline"> เพิ่มผู้ใช้งาน</span></a>
+                                </li>
+                                <li class="w-100 text-center">
+                                    <a href="/add_role" class="nav-link px-0"> <i class="fa-solid fa-user-gear"></i><span class="d-none d-sm-inline"> กำหนดสิทธิ์</span></a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#submenu3" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
+                                <i class="fa-solid fa-sitemap"></i> <span class="ms-1 d-none d-sm-inline">Splitter</span> </a>
+                                <ul class="collapse nav flex-column ms-1 align-items-center" id="submenu3" data-bs-parent="#menu">
+                                <li class="w-100 text-center">
+                                    <a href="/select_splitter" class="nav-link px-0"> <i class="fa-solid fa-pen"></i> <span class="d-none d-sm-inline">Edit</span> </a>
+                                </li>
+                                <li class="w-100 text-center">
+                                    <a href="/add_splitter" class="nav-link px-0"> <i class="fa-solid fa-plus"></i> <span class="d-none d-sm-inline">Add</span></a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="#submenu4" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
+                                <i class="fa-solid fa-map-location-dot"></i> <span class="ms-1 d-none d-sm-inline">Marker</span> </a>
+                                <ul class="collapse nav flex-column ms-1 align-items-center" id="submenu4" data-bs-parent="#menu">
+                                <li class="w-100 text-center">
+                                    <a href="/select_marker" class="nav-link px-0"> <i class="fa-solid fa-compass-drafting"></i> <span class="d-none d-sm-inline">Edit</span> </a>
+                                </li>
+                                <li class="w-100 text-center">
+                                    <a href="/add_marker" class="nav-link px-0"> <i class="fa-solid fa-plus"></i> <span class="d-none d-sm-inline">Add</span></a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        
+                    </ul>
+                    <hr class="dropdown-divider">
+                    <div class="dropdown pb-4">
+                        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                            <!-- <img src="https://github.com/mdo.png" alt="hugenerd" width="30" height="30" class="rounded-circle"> -->
+                            <i class="fa-solid fa-user-gear"></i> 
+                            <span class="d-none d-sm-inline mx-1">{{ user['fname'] }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                            <li><a class="dropdown-item" href="#">New project...</a></li>
+                            <li><a class="dropdown-item" href="#">Settings</a></li>
+                            <li><a class="dropdown-item" href="#">Profile</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col py-3">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-8 mx-auto my-5 p-5 border rounded rounded-4 shadow bg-white justify-content-center">
+            
+                            {% with messages = get_flashed_messages() %}
+                            {% if messages %}
+                            {% for messages in messages %}
+                            {% if messages == '✔️ INSERT IS COMPLETE' %}
+                            <div class="alert alert-success mt-3" role="alert">
+                                {{ messages }}
+                            </div>
+                            {% elif messages == '⚠️ Delete is Complete.' %}
+                            <div class="alert alert-warning mt-3" role="alert">
+                                {{ messages }}
+                            </div>
+                            {% else %}
+                            <div class="alert alert-danger mt-3" role="alert">
+                                {{ messages }}
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                            {% endif %}
+                            {% endwith %}
+                            <br>
+            
+                            <div class="text-light bg-success bg-opacity-75 shadow rounded-2 " style="font-size: 3.5em;">
+                                Loss Threshold
+                            </div><br>
+                            <div class="table-responsive">
+                                <table id="" class="display table table-striped" style="width:100%">
+            
+                                    <thead>
+                                        <tr>
+                                            <th>Seq</th>
+                                            <th>Pass</th>
+                                            <th>Warning</th>
+                                            <th>Danger</th>
+                                            <th>DateTime</th>
+                                            <th>Status</th>
+            
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for threshold in threshold %}
+                                        <tr>
+                                            <td><strong>{{ threshold['threshold_id'] }}</strong></td>
+                                            <td>
+                                                <div class="text-success text-center">
+                                                    <strong>{{ threshold['threshold_success'] }}</strong>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="text-warning text-center">
+                                                    <strong>{{ threshold['threshold_warning'] }}</strong>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="text-danger text-center">
+                                                    <strong>{{ threshold['threshold_danger'] }}</strong>
+                                                </div>
+                                            </td>
+                                            <td>{{ threshold['threshold_dt'] }}</td>
+                                            {% set status = threshold['threshold_status'] | int %}
+                                            {% if status == 1 %}
+                                            <td>
+                                                <div class="text-success text-center">
+                                                    <strong>กำลังใช้งาน</strong>
+                                                </div>
+                                            </td>
+                                            {% elif status == 0 %}
+                                            <td>
+                                                <div class="text-danger text-center">
+                                                    <strong>ยกเลิกการใช้งาน</strong>
+                                                </div>
+                                            </td>
+                                            {% else %}
+                                            <td>
+                                                <div class="text-primary text-center">
+                                                    <strong>ไม่พบสถานะ</strong>
+                                                </div>
+                                            </td>
+                                            {% endif %}
+            
+            
+            
+                                        </tr>
+                                        {% endfor %}
+            
+                                        <!-- <tfoot>
+                                        <tr>
+                                            <th>Seq</th>
+                                            <th>Splitter Type</th>
+                                            <th>Loss</th>
+                                            <th>Edit</th>
+                                            <th>Del</th>
+                                        </tr>
+                                    </tfoot> -->
+                                </table>
+                            </div>
+                            <a href="/" class="btn btn-outline-danger"><i class="fa-solid fa-house"></i> Home</a> 
+                            <a href="/edit_threshold" class="btn btn-outline-warning"><i class="fa-solid fa-pencil"></i> Edit Loss
+                                Threshold</a>
+            
+            
+            
+            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <header>
+        <div class="row justify-content-between bg-white py-3">
+            <div class="col-4"></div>
+            <div class="col-4 d-flex justify-content-center">
+                <a class="navbar-brand" href="http://research.ntplc.co.th/">
+                    <img src="{{ url_for('static',filename='img/logo.jpg') }}" alt="" width="80" height="55"
+                        class="d-inline-block align-text-top">
+                </a>
+            </div>
+            <div class="col-4 d-flex justify-content-end">
+              
+                        <li><a class="dropdown-item" href="/history"><i class="fa-solid fa-address-book"></i>
+                                DataBase</a></li>
+                        <li><a class="dropdown-item" href="/edit_olt"><i class="fa-solid fa-plug-circle-bolt"></i> Edit
+                                Power OLT</a></li>
+                        <li><a class="dropdown-item" href="/edit_threshold"><i class="fa-solid fa-explosion"></i> Edit
+                                Loss Budget Threshold</a></li>
+                        <li><a class="dropdown-item" href="/logout"><i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                Logout </a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header> -->
+
+    
+
+
+    <script src="{{ url_for('static',filename='bootstrap-5.2.0-beta1-dist/js/bootstrap.bundle.min.js') }}"></script>
+</body>
+
+</html>

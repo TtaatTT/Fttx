@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static',filename='favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ url_for('static',filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap-5.2.0-beta1-dist/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='fontawesome-free-6.1.2-web/css/all.min.css') }}">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <!-- playground-hide -->
+    <script>
+        const process = { env: {} };
+        process.env.GOOGLE_MAPS_API_KEY =
+            "AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg";
+    </script>
+    <!-- playground-hide-end -->
+
+    <link rel="stylesheet" type="text/css" href="/static/style.css" />
+    <!-- <script type="module" src="/index.js"></script> -->
+    <title>BFT : App Project-Maps</title>
+    <style>
+        body {
+            background-color: #FFD100;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        body,
+        html {
+            height: 100%;
+            width: 100%;
+        }
+
+        #map {
+            height:600px;
+            /* width: 100%; */
+        }
+    #btnClearLine{
+  margin-right: 10px;
+  margin-top: 12px;
+
+    }
+#pac-input {
+  background-color: #fff;
+  font-family: Roboto;
+  font-size: 15px;
+  font-weight: 300;
+  margin-left: 12px;
+  padding: 0 11px 0 13px;
+  text-overflow: ellipsis;
+  width: 600px;
+  height: 35px;
+  margin-top: 12px;
+}
+
+#pac-input:focus {
+  border-color: #4d90fe;
+}
+
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="row justify-content-between bg-white py-3">
+            <div class="col-4"></div>
+            <div class="col-4 d-flex justify-content-center">
+                <a class="navbar-brand" href="http://research.ntplc.co.th/">
+                    <img src="{{ url_for('static',filename='img/logo.jpg') }}" alt="NT R&D" width="70" height="45"
+                        class="d-inline-block align-text-top">
+                </a>
+            </div>
+            <div class="col-4 d-flex justify-content-end">
+                <!-- <a class="btn btn-outline-danger mb-3" href="/">คำนวณ</a> &nbsp; -->
+                <div class="dropdown">
+                    {% if user['fname'] == "admin" %}
+                    <button class="btn btn-outline-danger dropdown-toggle me-3" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false"><i class="fa-regular fa-circle-user"></i> <strong> {{ user['fname']
+                            }}</strong></button>
+                    {% else %}
+                    <button class="btn btn-outline-warning dropdown-toggle me-3" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false"><i class="fa-regular fa-circle-user"></i> {{ user['fname'] }}</button>
+                    {% endif %}
+                    <ul class="dropdown-menu">
+                        {% if user['fname'] == "admin" %}
+                        <li><a class="dropdown-item" href="/history"><i class="fa-solid fa-address-book"></i>
+                                DataBase</a></li>
+                        <li><a a class="dropdown-item" href="/select_splitter"><i class="fa-solid fa-wrench"></i> Edit
+                                Spiltter</a></li>
+                        <li><a class="dropdown-item" href="/edit_olt"><i class="fa-solid fa-plug-circle-bolt"></i> Edit
+                                OLT Power</a></li>
+                        <li><a class="dropdown-item" href="/edit_threshold"><i class="fa-solid fa-explosion"></i> Edit
+                                Loss Budget Threshold</a></li>
+                        {% elif user['fname'] != "admin" %}
+                        <li><a class="dropdown-item" href="/history"><i class="fa-solid fa-address-book"></i>
+                                History</a></li>
+                        <li><a class="dropdown-item" href="/edit_profile"><i class="fa-solid fa-user-pen"></i> Edit
+                                Profile</a></li>
+                        {% endif %}
+                        <li><a class="dropdown-item" href="/logout"><i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div id="container">
+        <div id="sidebar">
+                <div class="row">
+                    <div class="col-12 bg-white">
+                        <h1 class="text-center text-dark m-2" style="font-size: 2em;">
+                            การวิเคราะห์และคาดคะเนค่าการสูญเสียในโครงข่าย Fiber Optic
+                    </div><br><br>
+                    <input
+      id="pac-input"
+      class="controls"
+      type="text"
+      placeholder="Search Box"
+    />              
+    <button class="btn btn-warning" id="btnClearLine">Clear Line</button>
+<div id="map" class="col-12 col-sm-12 col-md-8">
+</div>
+
+<div class="col-12 col-sm-12 col-md-4 bg-white ">
+    <form action="/save" method="post" id="formLoss">
+        <div>
+            <br><br>
+            <input type="hidden" name="userID" value="{{ user['user_id'] }}">
+            <div class="row g-2 align-items-center">
+                <div class="col-auto text-center">
+                    <label for="ProjectName" class="fs-4 form-label text-dark">ชื่อโครงการ :</label>
+                </div>
+                <div class="col-auto">
+                    <input type="text" class="form-control border-warning shadow-sm" style="--bs-border-opacity: .5;"
+                        name="ProjectName" id="ProjectName" required autofocus autocomplete="on">
+                </div>
+                <div class="col-auto">
+                    <span id="show_power_olt" class="form-text text-secondary text-opacity-75">
+                    </span>
+                </div>
+            </div>
+            <div class="row g-2 align-items-center">
+                <div class="col-6 text-center">
+                    <label for="Distance" class="fs-4 form-label text-dark">ระยะทาง :</label>
+                </div>
+                <div class="col-6">
+                    <input type="number" min="0" step="0.001" readonly class="form-control border-warning shadow-sm"
+                        style="--bs-border-opacity: .5;" name="Distance" id="Distance">
+                </div>
+                <div class="col-6">
+                    <span id="show_ans_distance" class="form-text text-secondary text-opacity-75">
+                        Km.
+                </div>
+            </div>
+
+            <div class="row g-2 align-items-center">
+                <div class="col-6 text-center">
+                    <label for="Connector" class="fs-4 form-label text-dark">จำนวนหัว Connector
+                        :</label>
+                </div>
+                <div class="col-6">
+                    <input type="number" min="0" step="1" class="form-control border-warning shadow-sm"
+                        style="--bs-border-opacity: .5;" name="Connector" id="Connector">
+                </div>
+                <div class="col-6">
+                    <span id="show_ans_connector" class="form-text text-secondary text-opacity-75">
+                        Point.
+                    </span>
+                </div>
+            </div>
+
+            <div class="row g-2 align-items-center">
+                <div class="col-6 text-center">
+                    <label for="Splice" class="fs-4 form-label text-dark">จำนวนจุด Splice :</label>
+                </div>
+                <div class="col-6">
+                    <input type="number" min="0" step="1" class="form-control border-warning shadow-sm"
+                        style="--bs-border-opacity: .5;" name="Splice" id="Splice">
+                </div>
+
+                <div class="col-6">
+                    <span id="show_ans_splice" class="form-text text-secondary text-opacity-75">
+                        Point.
+                    </span>
+                </div>
+            </div>
+
+            <div class="row g-2 align-items-center">
+                <div class="col-6 text-center">
+                    <label for="splitter" class="fs-4 form-label text-dark">splitter :</label>
+                </div>
+
+                <div class="col-6">
+
+                    <div id="NumSPD">0</div>
+                </div>
+                <div class="col-6">
+
+                    <span id="sum_splt" class="form-text text-secondary text-opacity-75">
+                        Point.
+                    </span>
+                </div>
+            </div><br>
+            <div class="row">
+                <div class="col-6 text-center"></div>
+                <div id="addEl" class="text-center col-6 "></div>
+                <div class="col-6"></div>
+            </div><br>
+            <div class="d-grid mx-6 my-4 d-flex justify-content-center">
+                <div class="btn-group" role="group" aria-label="Basic example">
+                    <a href="#table"></a>
+                </div>
+            </div><br>
+            <div class="d-flex justify-content-between" id="showANS">
+
+            </div> <br><br>
+
+            <div class="d-grid gap-2 col-2 mx-auto">
+                <button class="btn btn-warning rounded-pill border-light text-dark" id="btnSubmit">คำนวณ</button>
+            </div>
+
+            <input type="hidden" name="olt_power" id="olt_power" value="{{ olt['olt_power'] }}">
+            <input type="hidden" name="splitter_arrl" id="splitter_arrl">
+            <input type="hidden" name="loss_budget" id="loss_budget">
+            <input type="hidden" name="poi" id="poi">
+            <input type="hidden" name="userID" id="userID" value="{{ user['user_id'] }}">
+    </form>
+
+</div>
+
+</div>
+
+
+
+            <!-- </div> -->
+        </div>
+
+
+        <div id="panel"></div>
+    </div>
+    <!-- </div> -->
+    </div>
+    <script src="{{ url_for('static',filename='bootstrap-5.2.0-beta1-dist/js/bootstrap.bundle.min.js') }}"></script>
+<script>
+        let olt_power = Number(document.getElementById('olt_power').value);
+        document.getElementById('show_power_olt').innerHTML = `OLT Power = +${olt_power} dB.`;
+        
+</script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDdJjxsRSzyYb0sUEdce9GLPZqqTOKohmw&libraries=geometry&callback=initMap&v=weekly&libraries=places"
+        defer></script>
+        <!-- <script>
+            function initAutocomplete() {
+  const map = new google.maps.Map(document.getElementById("map"), {
+    center: { lat: -33.8688, lng: 151.2195 },
+    zoom: 13,
+    mapTypeId: "roadmap",
+  });
+}
+
+window.initAutocomplete = initAutocomplete;
+
+        </script> -->
+    <script>
+        function initMap() {
+
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 12,
+                center: { lat: 14.020038, lng: 100.527984 },
+                gestureHandling: "greedy",
+            });
+
+            let marker;
+            let spli_num=0;
+            let markerList = [];
+            let drawLines = [];
+            let distanceList = [];
+            let sumDistance = [];
+            let allFlightPath = [];
+            let flightPath;
+
+            let img_marker = {
+                url: '/static/mk.png',
+                scaledSize: new google.maps.Size(50, 80),
+            }
+            let img_olt = {
+                url: '/static/mk_olt.png',
+                scaledSize: new google.maps.Size(40, 70),
+            }
+            const latLng_olt = [
+                { lat: 14.020842520289106 , lng: 100.52758588177157 },
+                { lat: 14.030441305191124 , lng: 100.5604355709685 },
+                { lat: 13.986433269350336 , lng: 100.59491976230144 }, 
+                { lat: 13.962832607332565 , lng: 100.51314962245691 },
+                { lat: 13.98652417400707 , lng: 100.51039874760303 }, 
+
+
+            ];
+
+            function clearPolyLine(){
+                totalDistance = 0;
+                console.log("sum: ", totalDistance);
+                document.getElementById('Distance').value = totalDistance;
+                // flightPath.setMap(null);
+                distanceList = [];
+                sumDistance = [];
+                drawLines = [];
+                allFlightPath.forEach((element, index) => {
+                    element.setMap(null);
+                });
+                
+                
+            }
+
+            document.getElementById('btnClearLine').addEventListener('click', function(event){
+                event.preventDefault();
+                clearPolyLine();
+                spli_num = 0;
+            });
+
+
+            function calcDistance(pos) {
+                console.log(pos);
+                let disTance = (google.maps.geometry.spherical.computeDistanceBetween(pos[0], pos[1]) / 1000).toFixed(2);
+                console.log(`distance: ${disTance} km`);
+                console.log(typeof (disTance));
+
+                distanceList.shift();
+
+                let convertDistance = Number(disTance);
+                sumDistance.push(convertDistance);
+                let totalDistance = sumDistance.reduce((a, b) => a + b, 0);
+                console.log("sum: ", totalDistance);
+                document.getElementById('Distance').value = totalDistance.toFixed(3);
+
+                if(totalDistance > 20) 
+                {
+                    alert('Exceed Threshold');
+                    clearPolyLine();
+                }
+
+            }
+
+            function placeMarker(position, map) {
+                marker = new google.maps.Marker({
+                    position: position,
+                    map: map,
+                    draggable: true,
+                });
+            }
+
+            function addMarker(position, map) {
+                marker = new google.maps.Marker({
+                    position: position,
+                    map: map,
+                });
+            }
+
+            const triangleCoords = [
+                { lat: 14.045793, lng: 100.499116 },
+                { lat: 14.014645, lng: 100.482911 },
+                { lat: 14.026353, lng: 100.460929 },
+                { lat: 14.026335, lng: 100.460883 },
+                { lat: 14.011496, lng: 100.452628 },
+                { lat: 14.006197, lng: 100.452750 },
+                { lat: 13.999248, lng: 100.464403 },
+                { lat: 13.992463, lng: 100.469573 },
+                { lat: 13.979743, lng: 100.470628 },
+                { lat: 13.978098, lng: 100.466514 },
+                { lat: 13.979989, lng: 100.460777 },
+                { lat: 13.979638, lng: 100.459838 },
+                { lat: 13.971234, lng: 100.457023 },
+                { lat: 13.971057, lng: 100.460210 },
+                { lat: 13.970328, lng: 100.460424 },
+                { lat: 13.971723, lng: 100.464823 },
+                { lat: 13.971546, lng: 100.465199 },
+                { lat: 13.970598, lng: 100.465574 },
+                { lat: 13.970703, lng: 100.466904 },
+                { lat: 13.968849, lng: 100.466797 },
+                { lat: 13.959035, lng: 100.477487 },
+                { lat: 13.950258, lng: 100.486209 },
+                { lat: 13.947558, lng: 100.487255 },
+                { lat: 13.946122, lng: 100.488557 },
+                { lat: 13.946028, lng: 100.487383 },
+                { lat: 13.945199, lng: 100.487424 },
+                { lat: 13.944765,  lng: 100.487424},
+                { lat: 13.942512,  lng: 100.489185},
+                { lat: 13.941970,  lng: 100.490588},
+                { lat: 13.936546,  lng: 100.501374},
+                { lat: 13.941705,  lng: 100.505894},
+                { lat: 13.944100,  lng: 100.512636},
+                { lat: 13.943802,  lng: 100.525830},
+                { lat: 13.944934,  lng: 100.531241},
+                { lat: 13.947652,  lng: 100.535002},
+                { lat: 13.952180,  lng: 100.538372},
+                { lat: 13.955760,  lng: 100.539217},
+                { lat: 13.956125,  lng: 100.539746},
+                { lat: 13.955515,  lng: 100.542156},
+                { lat: 13.954657,  lng: 100.541360},
+                { lat: 13.953684,  lng: 100.542008},
+                { lat: 13.954514,  lng: 100.544131},
+                { lat: 13.953627,  lng: 100.543807},
+                { lat: 13.953112,  lng: 100.544897},
+                { lat: 13.953340,  lng: 100.545517},
+                { lat: 13.952654,  lng: 100.545605},
+                { lat: 13.952568,  lng: 100.548524},
+                { lat: 13.951223,  lng: 100.552592},
+                { lat: 13.951366,  lng: 100.553447},
+                { lat: 13.950622,  lng: 100.554273},
+                { lat: 13.951624,  lng: 100.554747},
+                { lat: 13.950178,  lng: 100.556079},
+                { lat: 13.949898,  lng: 100.557066},
+                { lat: 13.950450,  lng: 100.560410},
+                { lat: 13.949567,  lng: 100.561532},
+                { lat: 13.950009,  lng: 100.562108},
+                { lat: 13.949803,  lng: 100.563958},
+                { lat: 13.950715,  lng: 100.565747},
+                { lat: 13.950450,  lng: 100.566687},
+                { lat: 13.951362,  lng: 100.567536},
+                { lat: 13.972463,  lng: 100.571637},
+                { lat: 13.964016,  lng: 100.538018},
+                { lat: 13.963433,  lng: 100.537717},
+                { lat: 13.964224,  lng: 100.537203},
+                { lat: 13.964662,  lng: 100.538703},
+                { lat: 13.973025,  lng: 100.571569},
+                { lat: 13.978963,  lng: 100.570090},
+                { lat: 13.978889,  lng: 100.570549},
+                { lat: 13.973000,  lng: 100.572079},
+                { lat: 13.951557,  lng: 100.567958},
+                { lat: 13.954610,  lng: 100.573696},
+                { lat: 13.950847,  lng: 100.590349},
+                { lat: 13.944321,  lng: 100.605428},
+                { lat: 13.979664,  lng: 100.600452},
+                { lat: 13.979743,  lng: 100.600625},
+                { lat: 13.980402,  lng: 100.603504},
+                { lat: 13.953512,  lng: 100.607422},
+                { lat: 13.953540,  lng: 100.604665},
+                { lat: 14.060810,  lng: 100.589737},
+                { lat: 14.060705,  lng: 100.587458},
+                { lat: 14.060899,  lng: 100.587395},
+                { lat: 14.049065,  lng: 100.587213},
+                { lat: 14.041705,  lng: 100.580780},
+                { lat: 14.039350,  lng: 100.568945},
+                { lat: 14.037760,  lng: 100.564090},
+                { lat: 14.041646,  lng: 100.554683},
+                { lat: 14.030165,  lng: 100.543030},
+                { lat: 14.031583,  lng: 100.538233},
+                { lat: 14.032422,  lng: 100.534144},
+                { lat: 14.031321,  lng: 100.532110},
+                { lat: 14.031963,  lng: 100.521686},
+                { lat: 14.045517,  lng: 100.499301},
+            ];
+
+            // สีเส้นในแผนที่
+            
+            function drawLine(drawLines, map) {
+                flightPath = new google.maps.Polyline({
+                    path: drawLines,
+                    geodesic: true,
+                    strokeColor: "#4FFF00",
+                    strokeOpacity: 1.0,
+                    strokeWeight: 2,
+                    map: map
+                });
+                allFlightPath.push(flightPath);
+            }
+
+            // Construct the polygon. สีพื้นที่ปทุม
+            const bermudaTriangle = new google.maps.Polygon({
+                paths: triangleCoords,
+                strokeColor: "#1c0140",
+                strokeOpacity: 0.2,
+                strokeWeight: 2,
+                fillColor: "#c49bfa",
+                fillOpacity: 0.2,
+                map: map
+            });
+            for (let i in latLng_olt) {
+            marker = new google.maps.Marker({
+                position: latLng_olt[i],
+                icon: img_olt,
+                map: map,
+                });
+            }
+          
+            let idx = 1;
+            fetch('/add_mk')
+                .then((response) => response.json())
+                .then((data_mk) => {
+                    console.log("data : ", data_mk)
+                    
+                    data_mk.forEach(function (marker) {
+                       let lat = Number(marker.lat);
+                       let lng = Number(marker.lng);
+                        marker = new google.maps.Marker({
+                            position: {
+                                lat: lat,
+                                lng: lng
+                            },
+                            map: map,
+                            title: marker.marker_name,
+                            icon: img_marker,
+                        })
+                        idx++;
+                        let infoWindow = new google.maps.InfoWindow();
+           
+         
+                        
+                        //   });
+                        //           });
+
+                        
+
+                        // for (let i in triangleCoords) {
+                        //     marker = new google.maps.Marker({
+                        //         position: triangleCoords[i],
+                        //         map: map,
+                        //     });
+                        (function (marker) {
+                            google.maps.event.addListener(marker, "click", () => {
+                                console.log(marker.getPosition());
+                                console.log(`lat: ${marker.getPosition().lat()}, long: ${marker.getPosition().lng()}`);
+
+                                // infoWindow.close();
+                                // infoWindow = new google.maps.InfoWindow({
+                                //     position: marker.getPosition(),
+                                // });
+                                // infoWindow.setContent("Splitter: 1/4\r\nUsed: 2\r\n");
+                                // infoWindow.setContent(marker);
+
+                                // infoWindow.open(map);
+
+                                drawLines.push(marker.getPosition());
+                                distanceList.push(marker.getPosition());
+                                if (drawLines.length > 1) {
+                                    drawLine(drawLines, map);
+                                }
+                                if (drawLines.length > 0) {
+                                    spli_num +=1;
+                                    document.getElementById('NumSPD').innerHTML = spli_num;
+                                    console.log(spli_num);
+                                }
+                                if (distanceList.length == 2) {
+                                    calcDistance(distanceList);
+                                }
+                            });
+                        })(marker)
+                        // }
+                    });
+                });
+
+
+
+            // map.addListener("click", (event) => {
+            //     console.log(event.latLng);
+            //     console.log(`lat: ${event.latLng.lat()}, long: ${event.latLng.lng()}`);
+            //     markerList.push(event.latLng);
+            //     if (markerList.length == 2) {
+            //         calcDistance(markerList);
+            //     }
+            //     placeMarker(event.latLng, map);
+            // });
+
+            // google.maps.event.addListener(marker, "dragend", () => {
+            //     console.log(marker.getPosition());
+            //     console.log(`lat: ${marker.getPosition().lat()}, long: ${marker.getPosition().lng()}`);
+
+            // });
+
+            // bermudaTriangle.setMap(map);
+
+  // Create the search box and link it to the UI element.
+  const input = document.getElementById("pac-input");
+  const searchBox = new google.maps.places.SearchBox(input);
+  const button = document.getElementById("btnClearLine");
+//   const clearLine = new google.maps.places.clearLine(button);
+  map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+  map.controls[google.maps.ControlPosition.TOP_RIGHT].push(button);
+
+  // Bias the SearchBox results towards current map's viewport.
+  map.addListener("bounds_changed", () => {
+    searchBox.setBounds(map.getBounds());
+  });
+
+  let markers = [];
+
+  // Listen for the event fired when the user selects a prediction and retrieve
+  // more details for that place.
+  searchBox.addListener("places_changed", () => {
+    const places = searchBox.getPlaces();
+
+    if (places.length == 0) {
+      return;
+    }
+
+    // Clear out the old markers.
+    markers.forEach((marker) => {
+      marker.setMap(null);
+    });
+    markers = [];
+
+    // For each place, get the icon, name and location.
+    const bounds = new google.maps.LatLngBounds();
+
+    places.forEach((place) => {
+      if (!place.geometry || !place.geometry.location) {
+        console.log("Returned place contains no geometry");
+        return;
+      }
+
+      const icon = {
+        url: place.icon,
+        size: new google.maps.Size(71, 71),
+        origin: new google.maps.Point(0, 0),
+        anchor: new google.maps.Point(17, 34),
+        scaledSize: new google.maps.Size(25, 25),
+      };
+
+      // Create a marker for each place.
+      markers.push(
+        new google.maps.Marker({
+          map,
+          icon,
+          title: place.name,
+          position: place.geometry.location,
+        })
+      );
+      if (place.geometry.viewport) {
+        // Only geocodes have viewport.
+        bounds.union(place.geometry.viewport);
+      } else {
+        bounds.extend(place.geometry.location);
+      }
+    });
+    map.fitBounds(bounds);
+  });
+
+        }
+
+
+
+    </script>
+</body>
+
+</html>

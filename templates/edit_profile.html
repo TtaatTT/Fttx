@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static',filename='favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ url_for('static',filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap-5.2.0-beta1-dist/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='fontawesome-free-6.1.2-web/css/all.min.css') }}">
+    <title>NT : Edit Profile</title>
+    <style>
+        body {
+            background-color: #FFD100;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="row justify-content-between bg-white py-3">
+            <div class="col-4"></div>
+            <div class="col-4 d-flex justify-content-center">
+                <a class="navbar-brand" href="http://research.ntplc.co.th/">
+                    <img src="{{ url_for('static',filename='img/logo.jpg') }}" alt="" width="70" height="45"
+                        class="d-inline-block align-text-top">
+                </a>
+            </div>
+            <div class="col-4 d-flex justify-content-end">
+                <div class="dropdown">
+                    <button class="btn btn-outline-warning dropdown-toggle me-3" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false"><i class="fa-regular fa-circle-user"></i> {{ user['fname'] }}</button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/map"><i class="fa-solid fa-magnifying-glass-chart"></i>  Calculate loss</a></li>
+                        <li><a class="dropdown-item" href="/history"><i class="fa-solid fa-address-book"></i>  History</a></li>
+                        <li><a class="dropdown-item" href="/logout"><i class="fa-solid fa-arrow-right-from-bracket"></i>  Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <div class="row my-5">
+            <div class="col-6 mx-auto p-5 border shadow rounded-4 bg-white">
+                <h1 class="text-secondary text-center text-opacity-75">Edit Profile</h1>
+                <form action="/edit_profile" method="post">
+                    <div class="row mb-3 my-5">
+                        <div class="col-2"></div>
+                        <div class="col-3">
+                            <label for="inputFullname" class="form-label">Fullname :</label>
+                        </div>
+                        <div class="col-6">
+                            <input type="text" class="form-control rounded-pill bg-warning shadow-sm"
+                                name="inputFullname" id="inputFullname" value="{{ user['fname'] }}">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-2"></div>
+                        <div class="col-3">
+                            <label for="inputEmail" class="form-label">Email :</label>
+                        </div>
+                        <div class="col-6">
+                            
+                            <input type="text" class="form-control rounded-pill bg-warning shadow-sm " style="cursor:not-allowed;"  name="inputEmail"
+                                id="inputEmail" value="{{ user['email'] }}" readonly >
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-2"></div>
+                        <div class="col-3">
+                            <label for="inputPassword" class="form-label">Password :</label>
+                        </div>
+                        <div class="col-6">
+                            <input type="password" class="form-control rounded-pill bg-warning shadow-sm"
+                                name="inputPassword" id="inputPassword">
+                            <!-- <div class="my-2">
+                                <input type="checkbox" class="form-check-input" id="hidePass" checked> Hide Password
+                            </div> -->
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-2"></div>
+                        <div class="col-3">
+                            <label for="inputRePassword" class="form-label">Re-Password :</label>
+                        </div>
+                        <div class="col-6">
+                            <input type="password" class="form-control rounded-pill bg-warning shadow-sm"
+                                name="inputRePassword" id="inputRePassword">
+                            <div class="my-2">
+                                <input type="checkbox" class="form-check-input" id="hideRepass" checked> Hide Password
+                            </div>
+                            <input type="hidden" name="userID" value="{{ user['user_id'] }}">
+                        </div>
+                    </div><br>
+                    <div class="d-grid gap-2 col-4 mx-auto">
+                        <button type="submit" class="btn btn-warning w-100 rounded-pill">Update</button>
+                    </div>
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                    {% for messages in messages %}
+                    {% if messages == '✔️ Update is Complete' %}
+                    <div class="alert alert-success mt-3" role="alert">
+                        {{ messages }}
+                    </div>
+                    {% elif messages == '⚠️ Please check it completely. !!' or "⚠️ Passwords don't match !!" %}
+                    <div class="alert alert-warning mt-3" role="alert">
+                        {{ messages }}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-danger mt-3" role="alert">
+                        {{ messages }}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+                    <br>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static',filename='bootstrap-5.2.0-beta1-dist/js/bootstrap.bundle.min.js') }}"></script>
+    <script>
+        // document.getElementById('hidePass').addEventListener('change', function (event) {
+        //     event.preventDefault();
+        //     let pw = document.getElementById("inputPassword");
+        //     (pw.type === "password") ? pw.type = "text" : pw.type = "password";
+        // });
+
+        document.getElementById('hideRepass').addEventListener('change', function (event) {
+            event.preventDefault();
+            let rpw = document.getElementById("inputRePassword");
+            (rpw.type === "password") ? rpw.type = "text" : rpw.type = "password";
+            let pw = document.getElementById("inputPassword");
+            (pw.type === "password") ? pw.type = "text" : pw.type = "password";
+        });
+    </script>
+</body>
+
+</html>

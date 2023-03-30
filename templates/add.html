@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static',filename='favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ url_for('static',filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap-5.2.0-beta1-dist/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='fontawesome-free-6.1.2-web/css/all.min.css') }}">
+    <title>NT : FTTx Calculating Loss Budgets</title>
+    <style>
+        body {
+            background-color: #FFD100;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        td {
+            font-size: larger;
+        }
+
+        th {
+            font-size: 1.25rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="row justify-content-between bg-white py-3">
+            <div class="col-4"></div>
+                <div class="col-4 d-flex justify-content-center">
+                    <a class="navbar-brand" href="http://research.ntplc.co.th/">
+                        <img src="{{ url_for('static',filename='img/logo.jpg') }}" alt="" width="70" height="45"
+                            class="d-inline-block align-text-top">
+                    </a>
+        </div>
+
+        <div class="col-4 d-flex justify-content-end">
+            <div class="dropdown">
+
+                {% if user['fname'] == "admin" %}
+                <button class="btn btn-outline-danger dropdown-toggle me-3" type="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                        <i class="fa-regular fa-circle-user">                    
+                        </i> 
+                            {{ user['fname'] }}
+                </button>
+
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="/history">
+                                <i class="fa-solid fa-address-book">
+                                </i> DataBase
+                            </a>
+                        </li>
+
+                        <li>
+                            <a a class="dropdown-item" href="/select_splitter">
+                                <i class="fa-solid fa-wrench">
+                                </i> Edit Spiltter
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item" href="/edit_olt">
+                                <i class="fa-solid fa-plug-circle-bolt">
+                                </i> Edit OLT Power
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item" href="/edit_threshold">
+                                <i class="fa-solid fa-explosion">                                   
+                                </i> Edit Loss Budget Threshold
+                            </a>
+                        </li>
+
+                {% elif user['fname'] != "admin" %}
+                <button class="btn btn-outline-warning dropdown-toggle me-3" type="button"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-regular fa-circle-user">                          
+                        </i> 
+                            {{user['fname'] }}
+                </button>
+
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="/history">
+                                <i class="fa-solid fa-address-book">
+                                </i> History
+                            </a>
+                        </li>
+
+                            <li>
+                                <a class="dropdown-item" href="/edit_profile">
+                                    <i class="fa-solid fa-user-pen">
+                                    </i> Edit Profile
+                                </a>
+                            </li>
+                        {% endif %}
+                        <li>
+                            <a class="dropdown-item" href="/logout">
+                                <i class="fa-solid fa-arrow-right-from-bracket">
+                                </i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- <nav class="navbar bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="http://research.ntplc.co.th/">
+                <img src="{{ url_for('static',filename='img/logo4.jpg') }}" alt="" width="270" height="55"
+                    class="d-inline-block align-text-top">
+            </a>
+        </div>
+    </nav> -->
+    <div class="container" id="cal">
+
+        <div class="row my-5">
+            <div class="col-auto mx-auto p-5 border border-warning shadow rounded-4 bg-white">
+                <form action="/save" method="post" id="formLoss">
+                    <div>
+                        <h1 class="text-center text-dark" style="font-size: 2em;">
+                            การวิเคราะห์และคาดคะเนค่าการสูญเสียในโครงข่าย Fiber Optic
+                    </div><br><br>
+                    
+                    <input type="hidden" name="userID" value="{{ user['user_id'] }}">
+                    <div class="row g-2 align-items-center">
+                        <div class="col-6 text-center">
+                            <label for="ProjectName" class="fs-4 form-label text-dark"> ชื่อโครงการ :
+                            </label>
+                        </div>
+
+                        <div class="col-auto">
+                            <input type="text" class="form-control border-warning shadow-sm"
+                                style="--bs-border-opacity: .5;" name="ProjectName" id="ProjectName" required autofocus
+                                autocomplete="on">
+                        </div>
+
+                        <div class="col-auto">
+                            <span id="show_power_olt" class="form-text text-secondary text-opacity-75">
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="row g-2 align-items-center">
+                        <div class="col-6 text-center">
+                            <label for="Distance" class="fs-4 form-label text-dark"> ระยะทาง :
+                            </label>
+                        </div>
+                        
+                        <div class="col-auto">
+                            <input type="number" min="0" step="0.001"  readonly class="form-control border-warning shadow-sm"
+                                style="--bs-border-opacity: .5;" name="Distance" id="Distance">
+                        </div>
+
+                        <div class="col-auto">
+                            <span id="show_ans_distance" class="form-text text-secondary text-opacity-75"> Km.
+                                <!-- </span><div id="show_ans_distance"></div> -->
+                        </div>
+                    </div>
+
+                    <div class="row g-2 align-items-center">
+                        <div class="col-6 text-center">
+                            <label for="Connector" class="fs-4 form-label text-dark"> จำนวนหัว Connector :
+                            </label>
+                        </div>
+
+                        <div class="col-auto">
+                            <input type="number" min="0" step="1" class="form-control border-warning shadow-sm"
+                                style="--bs-border-opacity: .5;" name="Connector" id="Connector">
+                        </div>
+
+                        <div class="col-auto">
+                            <span id="show_ans_connector" class="form-text text-secondary text-opacity-75"> Point.
+                            </span>
+                            <!-- <div id="show_ans_connector"></div> -->
+                        </div>
+                    </div>
+
+                    <div class="row g-2 align-items-center">
+                        <div class="col-6 text-center">
+                            <label for="Splice" class="fs-4 form-label text-dark"> จำนวนจุด Splice :
+                            </label>
+                        </div>
+
+                        <div class="col-auto">
+                            <input type="number" min="0" step="1" class="form-control border-warning shadow-sm"
+                                style="--bs-border-opacity: .5;" name="Splice" id="Splice">
+                        </div>
+
+                        <div class="col-auto">
+                            <span id="show_ans_splice" class="form-text text-secondary text-opacity-75"> Point.
+                            </span>
+                            <!-- <div id="show_ans_splice"></div> -->
+                        </div>
+                    </div>
+
+                    <div class="row g-2 align-items-center">
+                        <div class="col-6 text-center">
+                            <label for="splitter" class="fs-4 form-label text-dark"> splitter :
+                            </label>
+                        </div>
+
+                        <div class="col-auto">
+
+                            <!--                                 
+                                <select class="form-select  border-warning shadow-sm" style="--bs-border-opacity: .5;"
+                                    aria-label="Default select example">
+                                    
+                                </select> -->
+
+                            <div id="NumSPD"> 0
+                            </div>
+                        </div>
+
+                        <div class="col-auto">
+
+                            <span id="sum_splt" class="form-text text-secondary text-opacity-75"> Point.
+                            </span>
+                            <!-- <div id="sum_splt"></div> -->
+                        </div>
+                    </div><br>
+
+                    <div class="row">
+                        <div class="col-6 text-center">
+                        </div>
+
+                        <div id="addEl" class="text-center col-auto ">
+                        </div>
+
+                        <div class="col-auto">
+                        </div>
+                    </div><br>
+
+                    <div class="d-grid mx-auto my-4 d-flex justify-content-center">
+                        <div class="btn-group" role="group" aria-label="Basic example">
+                            <a href="#table">
+                            </a>
+                            
+                            <button
+                                class="col form-control btn btn-warning border-light text-light rounded-circle mx-auto"
+                                style="width: 55px; height: 55px; font-size: 1.5rem; font-weight: bolder;"
+                                id="btnAddsplitter"> +
+                            </button> &nbsp;
+
+                            <button
+                                class="col form-control btn btn-danger border-light text-light rounded-circle mx-auto"
+                                style="width: 55px; height: 55px; font-size: 1.5rem; font-weight: bolder;"
+                                id="btnDelSplt"> -
+                            </button>
+                        </div>
+                    </div><br>
+
+                    <div class="d-flex justify-content-between" id="showANS">
+                    </div><br><br>
+
+                    <div class="d-grid gap-2 col-2 mx-auto">
+                        <button class="btn btn-warning rounded-pill border-light text-dark"
+                            id="btnSubmit"> คำนวณ
+                        </button>
+                    </div>
+
+                    <input type="hidden" name="olt_power" id="olt_power" value="{{ olt['olt_power'] }}">
+                    <input type="hidden" name="splitter_arrl" id="splitter_arrl">
+                    <input type="hidden" name="loss_budget" id="loss_budget">
+                    <input type="hidden" name="poi" id="poi">
+                    <input type="hidden" name="userID" id="userID" value="{{ user['user_id'] }}">
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-9 mx-auto my-5 p-5 border rounded rounded-4 shadow bg-white">
+                <div class="table-responsive">
+                    <table style="width: 100%;">
+                        <tr>
+                            <th colspan="4" style="font-size: 2em; background: #FFd100;">
+                                <div class="text-light">
+                                    Link Attenuation Budget
+                                </div>
+                            </th>
+                        </tr>
+
+                        <tr>
+                            <th>No.</th>
+                            <th>Name</th>
+                            <th>type</th>
+                            <th>Attenuation (dB)</th>
+                        </tr>
+
+                        <tr>
+                            <td>1</td>
+                            <td>Optical cable (G.652D)</td>
+                            <td>1310 nm optical cable (dB/km.)</td>
+                            <td>0.35</td>
+                        </tr>
+
+                        <tr>
+                            <td>2</td>
+                            <td>Connection Point</td>
+                            <td>Quick Connector</td>
+                            <td>0.5</td>
+                        </tr>
+
+                        <tr>
+                            <td>3</td>
+                            <td>Redundancy</td>
+                            <td>Redundancy Attenuation</td>
+                            <td>1</td>
+                        </tr>
+                        
+                        {% for splitter in splitters %}
+                        {% set splt = splitter['splitter_id'] | int %}
+                        <tr>
+                            <td>{{ splt + 3 }}</td>
+                            {% if splt==1 %}
+                            <td rowspan="6">Optical Splitter</td>
+                            <a name="table"></a>
+                            {% endif %}
+                            <td>{{ splitter['splitter_type'] }}</td>
+                            <td>{{ splitter['splitter_value'] }}</td>
+                        </tr>
+                        {% endfor %}
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <script src="{{ url_for('static',filename='bootstrap-5.2.0-beta1-dist/js/bootstrap.bundle.min.js') }}"></script>
+    <script>
+        // รับระยะทาง จาก URL
+        const queryString = window.location.search;
+        console.log(queryString);
+        const urlParams = new URLSearchParams(queryString);
+        const estimatedDistance = urlParams.get('distance');
+        console.log(estimatedDistance);
+        document.getElementById('Distance').value = estimatedDistance / 1000;
+
+        // รับพิกัด จาก URL
+        const poi = urlParams.get('poi');
+        console.log(poi);
+        document.getElementById('poi').value = poi;
+
+        // ตรวจสอบการกรอก ระยะทาง
+        document.getElementById('Distance').addEventListener('input', function (event) {
+            event.preventDefault();
+            val = document.getElementById('Distance').value;
+            if (Number(val) > 20) {
+                document.getElementById('Distance').style.backgroundColor = 'red';
+            }
+
+            if (Number(val) <= 20) {
+                document.getElementById('Distance').style.background = '';
+            }
+        });
+
+        // กดปุ่มลบ Splitter
+        let idx = 0;
+        let loss_budget;
+        let sum = 0;
+        let show_sum = 0;
+
+
+        document.getElementById('btnDelSplt').addEventListener('click', function (event) {
+            event.preventDefault();
+            const list = document.getElementById('addEl');
+            list.removeChild(list.lastElementChild);
+            idx--;
+            document.getElementById('NumSPD').innerHTML = idx;
+
+        });
+
+        // กดปุ่มเพิ่ม Splitter
+        document.getElementById('btnAddsplitter').addEventListener('click', function (event) {
+            event.preventDefault();
+
+            /*let x = document.createElement('INPUT');
+            x.setAttribute("type", "text");
+            x.name = `input${idx}`;
+            x.id = `input${idx}`;
+            document.getElementById('addEl').appendChild(x);
+            idx++;*/
+
+            // const data = ['no splitter', '1:2', '1:4', '1:8', '1:16', '1:32', '1:64'];
+            // let sel = document.createElement('SELECT');
+            // sel.id = `splitter${idx}`;
+            // sel.name = `splitter${idx}`;
+            // sel.className = "form-select border-warning shadow-sm myDropdown";
+
+            // let splitterNum = 0;
+            // const splitterVal = ['0', '3.8', '7.5', '10.6', '13.8', '17', '20.5'];
+            // data.forEach(function (splitter) {
+            //     console.log(splitter);
+            //     let opt = document.createElement('OPTION');
+            //     opt.text = splitter;
+            //     opt.value = splitterVal[splitterNum];
+            //     sel.add(opt, null);
+            //     splitterNum++;
+            // });
+
+            // document.getElementById('addEl').appendChild(sel);
+            // document.getElementById('NumSPD').innerHTML = idx;
+            // idx++;
+
+            // เรียกข้อมูล Splitter จาก DataBase
+            fetch('/add_splt')
+                .then((response) => response.json())
+                .then((data) => {
+                    console.log(data)
+                    let sel = document.createElement('SELECT');
+                    sel.id = `test${idx}`;
+                    sel.name = `test${idx}`;
+                    sel.className = "form-select border-warning shadow-sm myDropdown"
+
+                    data.forEach(function (splt) {
+                        let opt = document.createElement('option');
+                        opt.text = splt.splitter_type;
+                        opt.value = splt.splitter_value;
+                        sel.add(opt, null);
+
+                    })
+                    idx++;
+                    // ส่งข้อมูลราบละเอียด Spiltter ไปแสดง
+                    document.getElementById('addEl').appendChild(sel);
+                    document.getElementById('NumSPD').innerHTML = idx;
+
+                    // ไปดูรายละเอียดที่ตาราง
+                    if (idx == 1) {
+                        location.href = "#table";
+                    }
+
+                });
+
+
+        });
+        //เพิ่มใหม่
+        document.getElementById("cal").addEventListener("mousemove", function (event) {
+            event.preventDefault()
+            let Distance = Number(document.getElementById('Distance').value)
+            // let Connector = Number(document.getElementById('Connector').value)
+            // let Splice = Number(document.getElementById('Splice').value)
+            let olt_power = Number(document.getElementById('olt_power').value)
+            document.getElementById('show_power_olt').innerHTML = `OLT Power = +${olt_power} dB.`;
+            document.getElementById('show_ans_distance').innerHTML = `Km. x 0.35 ≈ ${(Distance * 0.35).toFixed(2).replace(/\.?0*$/, '')} dBm.`;
+            // document.getElementById('show_ans_connector').innerHTML = `x 0.5 = ${Connector*0.5} dBm.`;
+            // document.getElementById('show_ans_splice').innerHTML = `x 0.1 = ${(Splice*0.1)} dBm.`;
+
+            // if(idx!=0){
+            if (idx > 0) {
+                let res = document.querySelectorAll('.myDropdown');
+                show_sum = 0;
+                if (show_sum == 0) {
+                    res.forEach(function (el) {
+                        let val = el.options[el.selectedIndex].value;
+                        console.log(val)
+                        show_sum += Number(val);
+                    });
+                    document.getElementById('sum_splt').innerHTML = `Point. ≈ ${(show_sum).toFixed(2).replace(/\.?0*$/, '')} dBm.`;
+                }
+            }
+            else {
+
+                document.getElementById('sum_splt').innerHTML = 'Point.';
+            }
+
+            // document.getElementById('Connector').addEventListener('change', function (event) {
+            // event.preventDefault();
+            let Connector = Number(document.getElementById('Connector').value)
+            if(Connector != '' && Connector > 0){
+            document.getElementById('show_ans_connector').innerHTML = `Point. x 0.5 ≈ ${(Connector * 0.5).toFixed(2).replace(/\.?0*$/, '')} dBm.`;
+            }
+            else{
+                document.getElementById('show_ans_connector').innerHTML = "Point.";
+            }
+        // });
+
+        // document.getElementById('Splice').addEventListener('input', function (event) {
+        //     event.preventDefault();
+            let Splice = Number(document.getElementById('Splice').value)
+            if(Splice != '' && Splice > 0){
+            document.getElementById('show_ans_splice').innerHTML = `Point. x 0.1 ≈ ${(Splice * 0.1).toFixed(2).replace(/\.?0*$/, '')} dBm.`;
+        }
+            else{
+                document.getElementById('show_ans_splice').innerHTML = "Point.";
+            }
+        // });
+            // loss_budget = (olt_power - (((Distance * 0.35) + (Connector * 0.5) + (Splice * 0.1) + (show_sum)) + 1))
+            // let ans = `+${olt_power} - ((${Distance} x 0.35) + (${Connector} x 0.5) + (${Splice} x 0.1) + ${show_sum} + 1 )`;
+            // document.getElementById("showANS").innerHTML = ans;
+        });
+
+
+        // ปุ่มส่ง Submit 
+        document.getElementById('btnSubmit').addEventListener('click', function (event) {
+            event.preventDefault();
+            let arrl = [];
+            let arrl_text = [];
+            let spltFormat;
+            let res = document.querySelectorAll('.myDropdown');
+            let name = document.getElementById("ProjectName").value
+            if (name != '') {
+                console.log(res);
+                res.forEach(function (el) {
+                    let val = el.options[el.selectedIndex].value;
+                    let val_text = el.options[el.selectedIndex].text;
+                    console.log(val)
+                    sum += Number(val);
+                    spltFormat = { "splitter": val_text, "loss": val }
+                    arrl.push(spltFormat)
+                    arrl_text.push(val_text)
+                });
+
+                if (sum == 0) {
+                    spltFormat = { "splitter":"No splitter" }
+                    arrl.push(spltFormat)
+                }
+
+                // let splitter = Number(document.getElementById('splitter_arrl').value);
+
+
+                let Distance = Number(document.getElementById('Distance').value)
+                let Connector = Number(document.getElementById('Connector').value)
+                let Splice = Number(document.getElementById('Splice').value)
+                let olt_power = Number(document.getElementById('olt_power').value)
+                console.log(olt_power)
+                // loss_budget = (olt_power - ((Distance * 0.35) + (Connector * 0.5) + (Splice * 0.1) + sum) + 1)
+                loss_budget = (olt_power - (((Distance * 0.35) + (Connector * 0.5) + (Splice * 0.1) + (show_sum)) + 1))
+
+                document.getElementById('loss_budget').value = loss_budget;
+                //  คำนวณค่า Loss 
+                console.log(arrl, sum, loss_budget);
+                // document.getElementById('splitter_arrl').value =  (idx-1)+" Point : ["+arrl_text+"] / ("+arrl+")"; 
+                document.getElementById('splitter_arrl').value = JSON.stringify(arrl);
+                document.getElementById('formLoss').submit();
+            }
+            else {
+                let name = document.getElementById("ProjectName");
+                name.style.backgroundColor = 'yellow';
+                alert("กรุณากรอกชื่อโครงการ");
+                name.addEventListener('input', function (event) {
+                    event.preventDefault();
+                    
+                    if (name != '') {
+                        name.style.backgroundColor = '';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

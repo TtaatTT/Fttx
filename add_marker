@@ -1,0 +1,1107 @@
+/**
+ * @license
+ * Copyright 2019 Google LLC. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+function initMap() {
+  const myLatlng = {
+    lat: -25.363,
+    lng: 131.044
+  };
+  const map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 4,
+    center: myLatlng,
+  });
+  // Create the initial InfoWindow.
+  /*let infoWindow = new google.maps.InfoWindow({
+    content: "Click the map to get Lat/Lng!",
+    position: myLatlng,
+  });
+
+  infoWindow.open(map);*/
+
+  let marker = new google.maps.Marker({
+    position: myLatlng,
+    map,
+    title: "Click to zoom",
+    draggable: true,
+  });
+
+  // Configure the click listener.
+  map.addListener("click", (mapsMouseEvent) => {
+    // Close the current InfoWindow.
+    /*infoWindow.close();
+    // Create a new InfoWindow.
+    infoWindow = new google.maps.InfoWindow({
+      position: mapsMouseEvent.latLng,
+    });
+    infoWindow.setContent(
+      JSON.stringify(mapsMouseEvent.latLng.toJSON(), null, 2)
+    );
+    infoWindow.open(map);*/
+    marker.setMap(null);
+
+    let myClick = JSON.stringify(mapsMouseEvent.latLng.toJSON())
+    console.log(myClick);
+
+    marker = new google.maps.Marker({
+      position: mapsMouseEvent.latLng,
+      draggable: true,
+    });
+
+    marker.setMap(map);
+
+    document.getElementById('getpos').addEventListener('click', (event) => {
+      console.log("get pos", marker.getPosition())
+      console.log("toString", marker.getPosition().toString())
+      console.log("toJson", marker.getPosition().toJSON())
+      console.log("lat", marker.getPosition().lat(), mapsMouseEvent.latLng.lat())
+      console.log("lng", marker.getPosition().lng(), )
+    });
+
+
+  });
+}
+
+window.initMap = initMap;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+//  11 - 01 - 2566
+
+<script
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDdJjxsRSzyYb0sUEdce9GLPZqqTOKohmw&libraries=geometry&callback=initMap&v=weekly"
+defer></script>
+
+function initMap() {
+  const map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 15,
+    center: { lat: 14.020038, lng: 100.527984 },
+  });
+  let marker;
+  let markerList = [];
+  
+  function calcDistance(pos){
+  	console.log(pos);
+    let disTance = (google.maps.geometry.spherical.computeDistanceBetween(pos[0],pos[1])/1000).toFixed(2);
+   	console.log(`distance: ${disTance}`);  
+  }
+  function placeMarker(position, map){
+  marker = new google.maps.Marker({
+  	position: position,
+    map: map,
+    draggable: true,
+  });
+  }
+  
+  map.addListener("click", (event) =>{
+  	  	console.log(event.latLng);
+        console.log(`lat: ${event.latLng.lat()}, long: ${event.latLng.lng()}`);
+        markerList.push(event.latLng);
+        if(markerList.length == 2){
+        calcDistance(markerList);
+        }
+        placeMarker(event.latLng, map);
+        });
+      
+      google.maps.event.addListener(marker, "dragend", ()=> {
+        console.log(marker.getPosition());
+  			console.log(`lat: ${marker.getPosition().lat()}, long: ${marker.getPosition().lng()}`);    
+       
+  });
+  
+  
+  }
+
+
+
+  // old_code
+
+  const numberMarker = 2;
+
+  let markerArray = [];
+  let markerArray1 = [];
+  let positionArr = [];
+  let marker;
+  let marker_nt;
+  let img_nt;
+  let estimatedDistance;
+
+  // Initialize and add the map
+  function initMap() {
+      
+      idx=0;
+      const directionsService = new google.maps.DirectionsService();
+      const directionsRenderer = new google.maps.DirectionsRenderer();
+      // The location of pathumthani
+      const pathumthani = {
+          lat: 14.020495084837725,
+          lng: 100.52805764451331
+      };
+      // The map, centered at pathumthani
+      const map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 15,
+          center: pathumthani,
+          gestureHandling: "greedy",
+
+      });
+      // หมุด NT 
+      img_nt = {
+          url: '/static/mk_nt.png',
+          scaledSize: new google.maps.Size(40, 60),
+      }
+      // หมุด
+      img_marker = {
+          url: '/static/mk.png',
+          scaledSize: new google.maps.Size(60, 80),
+      }
+      marker_nt = new google.maps.Marker({
+          position: pathumthani,
+          map: map,
+          title: 'ชุมสายปทุมธานี',
+          icon: img_nt,
+      });
+      fetch('/add_mk')
+          .then((response) => response.json())
+          .then((data) => {
+              console.log("data : ",data)
+              // let sel = document.createElement('SELECT');
+         
+      data.forEach(function (marker) {
+      // let opt = document.createElement('option');
+       
+      marker = new google.maps.Marker({
+          position: {lat : marker.lat,
+                      lng : marker.lng},
+          map: map,
+          title: marker.marker_name,
+          icon: img_marker,
+      })
+      idx++;
+  });
+      });
+      // new 
+      markerArray.push(pathumthani);
+      positionArr.push(JSON.stringify(pathumthani))
+
+
+
+      map.addListener("click", (mapsMouseEvent) => {
+          if (markerArray1.length >= 1) {
+              alert(`Marker > 1 Item !!`)
+          }
+
+          else {
+              
+
+              directionsRenderer.setMap(map);
+              marker = new google.maps.Marker({
+                  map,
+                  draggable: true,
+                  position: mapsMouseEvent.latLng,
+
+              });
+              console.log(mapsMouseEvent.latLng);
+              markerArray.push(mapsMouseEvent.latLng);
+              markerArray1.push(marker);
+
+              positionArr.push(JSON.stringify(mapsMouseEvent.latLng.toJSON()))
+
+              let countMarker = markerArray.length;
+              console.log(countMarker);
+
+              if (countMarker == numberMarker) {
+                  console.log(markerArray.length, markerArray)
+                  console.log(markerArray1.length)
+                  calculateAndDisplayRoute(directionsService, directionsRenderer, markerArray, map)
+              
+              }
+          }
+      });
+
+      document.getElementById('clearBtn').addEventListener('click', function () {
+          console.log(markerArray)
+          for (let i = 0; i < markerArray1.length; i++) {
+              console.log(i, markerArray[i]);
+              markerArray1[i].setMap(null);
+          }
+          markerArray = [];
+          markerArray1 = [];
+          positionArr = [];
+          directionsRenderer.setMap(null);
+          document.getElementById('total').innerHTML = 0;
+          // new
+          markerArray.push(pathumthani);
+          positionArr.push(JSON.stringify(pathumthani))
+
+      });
+
+const triangleCoords = [{
+  lat: 14.045793,
+  lng: 100.499116
+},
+{
+  lat: 14.014645,
+  lng: 100.482911
+},
+{
+  lat: 14.026353,
+  lng: 100.460929
+},
+
+{
+  lat: 14.026335,
+  lng: 100.460883
+},
+{
+  lat: 14.011496,
+  lng: 100.452628
+},
+{
+  lat: 14.006197,
+  lng: 100.452750
+},
+{
+  lat: 13.999248,
+  lng: 100.464403
+},
+{
+  lat: 13.992463,
+  lng: 100.469573
+},
+{
+  lat: 13.979743,
+  lng: 100.470628
+},
+{
+  lat: 13.978098,
+  lng: 100.466514
+},
+{
+  lat: 13.979989,
+  lng: 100.460777
+},
+{
+  lat: 13.979638,
+  lng: 100.459838
+},
+{
+  lat: 13.971234,
+  lng: 100.457023
+},
+{
+  lat: 13.971057,
+  lng: 100.460210
+},
+{
+  lat: 13.970328,
+  lng: 100.460424
+},
+{
+  lat: 13.971723,
+  lng: 100.464823
+},
+{
+  lat: 13.971546,
+  lng: 100.465199
+},
+{
+  lat: 13.970598,
+  lng: 100.465574
+},
+{
+  lat: 13.970703,
+  lng: 100.466904
+},
+{
+  lat: 13.968849,
+  lng: 100.466797
+},
+{
+  lat: 13.959035,
+  lng: 100.477487
+},
+{
+  lat: 13.950258,
+  lng: 100.486209
+},
+{
+  lat: 13.947558,
+  lng: 100.487255
+},
+{
+  lat: 13.946122,
+  lng: 100.488557
+},
+{
+  lat: 13.946028,
+  lng: 100.487383
+},
+{
+  lat: 13.945199,
+  lng: 100.487424
+},
+{
+  lat: 13.944765,
+  lng: 100.487424
+},
+{
+  lat: 13.942512,
+  lng: 100.489185
+},
+
+{
+  lat: 13.941970,
+  lng: 100.490588
+},
+{
+  lat: 13.936546,
+  lng: 100.501374
+},
+{
+  lat: 13.941705,
+  lng: 100.505894
+},
+{
+  lat: 13.944100,
+  lng: 100.512636
+},
+{
+  lat: 13.943802,
+  lng: 100.525830
+},
+{
+  lat: 13.944934,
+  lng: 100.531241
+},
+{
+  lat: 13.947652,
+  lng: 100.535002
+},
+{
+  lat: 13.952180,
+  lng: 100.538372
+},
+{
+  lat: 13.955760,
+  lng: 100.539217
+},
+{
+  lat: 13.956125,
+  lng: 100.539746
+},
+{
+  lat: 13.955515,
+  lng: 100.542156
+},
+{
+  lat: 13.954657,
+  lng: 100.541360
+},
+{
+  lat: 13.953684,
+  lng: 100.542008
+},
+{
+  lat: 13.954514,
+  lng: 100.544131
+},
+{
+  lat: 13.953627,
+  lng: 100.543807
+},
+{
+  lat: 13.953112,
+  lng: 100.544897
+},
+{
+  lat: 13.953340,
+  lng: 100.545517
+},
+{
+  lat: 13.952654,
+  lng: 100.545605
+},
+{
+  lat: 13.952568,
+  lng: 100.548524
+},
+{
+  lat: 13.951223,
+  lng: 100.552592
+},
+{
+  lat: 13.951366,
+  lng: 100.553447
+},
+{
+  lat: 13.950622,
+  lng: 100.554273
+},
+{
+  lat: 13.951624,
+  lng: 100.554747
+},
+{
+  lat: 13.950178,
+  lng: 100.556079
+},
+{
+  lat: 13.949898,
+  lng: 100.557066
+},
+{
+  lat: 13.950450,
+  lng: 100.560410
+},
+{
+  lat: 13.949567,
+  lng: 100.561532
+},
+{
+  lat: 13.950009,
+  lng: 100.562108
+},
+{
+  lat: 13.949803,
+  lng: 100.563958
+},
+{
+  lat: 13.950715,
+  lng: 100.565747
+},
+{
+  lat: 13.950450,
+  lng: 100.566687
+},
+{
+  lat: 13.951362,
+  lng: 100.567536
+},
+{
+  lat: 13.972463,
+  lng: 100.571637
+},
+{
+  lat: 13.964016,
+  lng: 100.538018
+},
+{
+  lat: 13.963433,
+  lng: 100.537717
+},
+{
+  lat: 13.964224,
+  lng: 100.537203
+},
+{
+  lat: 13.964662,
+  lng: 100.538703
+},
+{
+  lat: 13.973025,
+  lng: 100.571569
+},
+{
+  lat: 13.978963,
+  lng: 100.570090
+},
+{
+  lat: 13.978889,
+  lng: 100.570549
+},
+{
+  lat: 13.973000,
+  lng: 100.572079
+},
+{
+  lat: 13.951557,
+  lng: 100.567958
+},
+{
+  lat: 13.954610,
+  lng: 100.573696
+},
+{
+  lat: 13.950847,
+  lng: 100.590349
+},
+{
+  lat: 13.944321,
+  lng: 100.605428
+},
+{ 
+  lat: 13.979664, 
+  lng: 100.600452 
+},
+{ 
+  lat: 13.979743, 
+  lng: 100.600625 
+},
+{ 
+  lat: 13.980402, 
+  lng: 100.603504 
+},
+{ 
+  lat: 13.953512, 
+  lng: 100.607422 
+},
+
+{ 
+  lat: 13.953540, 
+  lng: 100.604665 
+},
+
+{ 
+  lat: 14.060810, 
+  lng: 100.589737 
+},
+{ 
+  lat: 14.060705, 
+  lng: 100.587458 
+},
+{ 
+  lat: 14.060899, 
+  lng: 100.587395 
+},
+{ 
+  lat: 14.049065, 
+  lng: 100.587213 
+},
+{ 
+  lat: 14.041705, 
+  lng: 100.580780 
+},
+{ 
+  lat: 14.039350, 
+  lng: 100.568945 
+},
+{ 
+  lat: 14.037760, 
+  lng: 100.564090 
+},
+{ 
+  lat: 14.041646, 
+  lng: 100.554683 
+},
+{ 
+  lat: 14.030165, 
+  lng: 100.543030 
+},
+{ 
+  lat: 14.031583, 
+  lng: 100.538233 
+},
+{ 
+  lat: 14.032422, 
+  lng: 100.534144 
+},
+{ 
+  lat: 14.031321, 
+  lng: 100.532110 
+},
+{ 
+  lat: 14.031963, 
+  lng: 100.521686 
+},
+{ 
+  lat: 14.045517, 
+  lng: 100.499301 
+},
+
+];
+// Construct the polygon.
+const bermudaTriangle = new google.maps.Polygon({
+  paths: triangleCoords,
+  strokeColor: "#1c0140",
+  strokeOpacity: 0.2,
+  strokeWeight: 2,
+  fillColor: "#c49bfa",
+  fillOpacity: 0.2,
+});
+
+bermudaTriangle.setMap(map);
+  }
+
+  function calculateAndDisplayRoute(directionsService, directionsRenderer, markerArray, map) {
+
+      directionsService
+          .route({
+              origin: markerArray[0],
+              destination: markerArray[1],
+              travelMode: google.maps.TravelMode.DRIVING,
+
+          })
+          .then((response) => {
+              directionsRenderer.setDirections(response);
+              console.log(response.routes[0].legs[0].distance);
+              estimatedDistance = response.routes[0].legs[0].distance.value;
+              document.getElementById('total').innerHTML = estimatedDistance / 1000;
+             
+
+          })
+          .catch((e) => window.alert("Directions request failed due to " + e));
+
+      
+  }
+
+  window.initMap = initMap;
+
+  document.getElementById('sendBtn').addEventListener('click', function (event) {
+      event.preventDefault();
+      let Distance = estimatedDistance / 1000;
+      if (Distance > 0 && Distance <= 20) {
+          if (markerArray1.length == 1) {
+              window.location = `/add?distance=${estimatedDistance}&poi=${positionArr}`;
+          }
+          else {
+              alert(`Marker > 1 Item !!`)
+          }
+      }
+
+      else {
+
+          alert(`ระยะทาง ${Distance} > 20 km ซึ่งเกินค่ามาตรฐาน !!`)
+      }
+
+
+  })
+
+
+  // 18-01-2566
+
+  function initMap() {
+
+      const map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 15,
+          center: { lat: 14.020038, lng: 100.527984 },
+      });
+
+      let marker;
+      let markerList = [];
+      let distanceList = [];
+      let sumDistance = [];
+
+      function calcDistance(pos) {
+          console.log(pos);
+          let disTance = (google.maps.geometry.spherical.computeDistanceBetween(pos[0], pos[1]) / 1000).toFixed(2);
+          console.log(`distance: ${disTance} km`);
+          console.log(typeof(disTance));
+          
+          distanceList.shift();
+          
+          let convertDistance = Number(disTance);
+          sumDistance.push(convertDistance);
+          let totalDistance = sumDistance.reduce((a, b) => a + b, 0);
+          console.log("sum: " , totalDistance);
+
+          if (totalDistance > 1) {
+              alert('Exceed Threshold');
+          }
+          
+      }
+
+      function placeMarker(position, map) {
+          marker = new google.maps.Marker({
+              position: position,
+              map: map,
+              draggable: true,
+          });
+      }
+
+      function addMarker(position, map) {
+          marker = new google.maps.Marker({
+              position: position,
+              map: map,
+          });
+      }
+
+      const triangleCoords = [
+          {lat: 14.045793,lng: 100.499116},
+          {lat: 14.014645,lng: 100.482911},
+          {lat: 14.026353,lng: 100.460929},
+          {lat: 14.026335,lng: 100.460883},
+          {lat: 14.011496,lng: 100.452628},
+          {lat: 14.006197,lng: 100.452750},
+          {lat: 13.999248,lng: 100.464403},
+          {lat: 13.992463,lng: 100.469573},
+          {lat: 13.979743,lng: 100.470628},
+          {lat: 13.978098,lng: 100.466514},
+          {lat: 13.979989,lng: 100.460777},
+          {lat: 13.979638,lng: 100.459838},
+          {lat: 13.971234,lng: 100.457023},
+          {lat: 13.971057,lng: 100.460210},
+          {lat: 13.970328,lng: 100.460424},
+          {lat: 13.971723,lng: 100.464823},
+          {lat: 13.971546,lng: 100.465199},
+          {lat: 13.970598,lng: 100.465574},
+          {lat: 13.970703,lng: 100.466904},
+          {lat: 13.968849,lng: 100.466797},
+          {lat: 13.959035,lng: 100.477487},
+          {lat: 13.950258,lng: 100.486209},
+          {lat: 13.947558,lng: 100.487255},
+          {lat: 13.946122,lng: 100.488557},
+          {lat: 13.946028,lng: 100.487383},
+          {
+              lat: 13.945199,
+              lng: 100.487424
+          },
+          {
+              lat: 13.944765,
+              lng: 100.487424
+          },
+          {
+              lat: 13.942512,
+              lng: 100.489185
+          },
+
+          {
+              lat: 13.941970,
+              lng: 100.490588
+          },
+          {
+              lat: 13.936546,
+              lng: 100.501374
+          },
+          {
+              lat: 13.941705,
+              lng: 100.505894
+          },
+          {
+              lat: 13.944100,
+              lng: 100.512636
+          },
+          {
+              lat: 13.943802,
+              lng: 100.525830
+          },
+          {
+              lat: 13.944934,
+              lng: 100.531241
+          },
+          {
+              lat: 13.947652,
+              lng: 100.535002
+          },
+          {
+              lat: 13.952180,
+              lng: 100.538372
+          },
+          {
+              lat: 13.955760,
+              lng: 100.539217
+          },
+          {
+              lat: 13.956125,
+              lng: 100.539746
+          },
+          {
+              lat: 13.955515,
+              lng: 100.542156
+          },
+          {
+              lat: 13.954657,
+              lng: 100.541360
+          },
+          {
+              lat: 13.953684,
+              lng: 100.542008
+          },
+          {
+              lat: 13.954514,
+              lng: 100.544131
+          },
+          {
+              lat: 13.953627,
+              lng: 100.543807
+          },
+          {
+              lat: 13.953112,
+              lng: 100.544897
+          },
+          {
+              lat: 13.953340,
+              lng: 100.545517
+          },
+          {
+              lat: 13.952654,
+              lng: 100.545605
+          },
+          {
+              lat: 13.952568,
+              lng: 100.548524
+          },
+          {
+              lat: 13.951223,
+              lng: 100.552592
+          },
+          {
+              lat: 13.951366,
+              lng: 100.553447
+          },
+          {
+              lat: 13.950622,
+              lng: 100.554273
+          },
+          {
+              lat: 13.951624,
+              lng: 100.554747
+          },
+          {
+              lat: 13.950178,
+              lng: 100.556079
+          },
+          {
+              lat: 13.949898,
+              lng: 100.557066
+          },
+          {
+              lat: 13.950450,
+              lng: 100.560410
+          },
+          {
+              lat: 13.949567,
+              lng: 100.561532
+          },
+          {
+              lat: 13.950009,
+              lng: 100.562108
+          },
+          {
+              lat: 13.949803,
+              lng: 100.563958
+          },
+          {
+              lat: 13.950715,
+              lng: 100.565747
+          },
+          {
+              lat: 13.950450,
+              lng: 100.566687
+          },
+          {
+              lat: 13.951362,
+              lng: 100.567536
+          },
+          {
+              lat: 13.972463,
+              lng: 100.571637
+          },
+          {
+              lat: 13.964016,
+              lng: 100.538018
+          },
+          {
+              lat: 13.963433,
+              lng: 100.537717
+          },
+          {
+              lat: 13.964224,
+              lng: 100.537203
+          },
+          {
+              lat: 13.964662,
+              lng: 100.538703
+          },
+          {
+              lat: 13.973025,
+              lng: 100.571569
+          },
+          {
+              lat: 13.978963,
+              lng: 100.570090
+          },
+          {
+              lat: 13.978889,
+              lng: 100.570549
+          },
+          {
+              lat: 13.973000,
+              lng: 100.572079
+          },
+          {
+              lat: 13.951557,
+              lng: 100.567958
+          },
+          {
+              lat: 13.954610,
+              lng: 100.573696
+          },
+          {
+              lat: 13.950847,
+              lng: 100.590349
+          },
+          {
+              lat: 13.944321,
+              lng: 100.605428
+          },
+          {
+              lat: 13.979664,
+              lng: 100.600452
+          },
+          {
+              lat: 13.979743,
+              lng: 100.600625
+          },
+          {
+              lat: 13.980402,
+              lng: 100.603504
+          },
+          {
+              lat: 13.953512,
+              lng: 100.607422
+          },
+
+          {
+              lat: 13.953540,
+              lng: 100.604665
+          },
+
+          {
+              lat: 14.060810,
+              lng: 100.589737
+          },
+          {
+              lat: 14.060705,
+              lng: 100.587458
+          },
+          {
+              lat: 14.060899,
+              lng: 100.587395
+          },
+          {
+              lat: 14.049065,
+              lng: 100.587213
+          },
+          {
+              lat: 14.041705,
+              lng: 100.580780
+          },
+          {
+              lat: 14.039350,
+              lng: 100.568945
+          },
+          {
+              lat: 14.037760,
+              lng: 100.564090
+          },
+          {
+              lat: 14.041646,
+              lng: 100.554683
+          },
+          {
+              lat: 14.030165,
+              lng: 100.543030
+          },
+          {
+              lat: 14.031583,
+              lng: 100.538233
+          },
+          {
+              lat: 14.032422,
+              lng: 100.534144
+          },
+          {
+              lat: 14.031321,
+              lng: 100.532110
+          },
+          {
+              lat: 14.031963,
+              lng: 100.521686
+          },
+          {
+              lat: 14.045517,
+              lng: 100.499301
+          },
+      ];
+
+      let drawLines = [];
+      function drawLine(drawLines, map) {
+          const flightPath = new google.maps.Polyline({
+              path: drawLines,
+              geodesic: true,
+              strokeColor: "#FF0000",
+              strokeOpacity: 1.0,
+              strokeWeight: 2,
+              map: map
+          });
+      }
+
+      // Construct the polygon.
+      const bermudaTriangle = new google.maps.Polygon({
+          paths: triangleCoords,
+          strokeColor: "#1c0140",
+          strokeOpacity: 0.2,
+          strokeWeight: 2,
+          fillColor: "#c49bfa",
+          fillOpacity: 0.2,
+          map: map
+      });
+
+      let infoWindow = new google.maps.InfoWindow();
+
+      
+      for (let i in triangleCoords) {
+          marker = new google.maps.Marker({
+              position: triangleCoords[i],
+              map: map,
+          });
+          (function(marker){
+              google.maps.event.addListener(marker, "click", () => {
+                  console.log(marker.getPosition());
+                  console.log(`lat: ${marker.getPosition().lat()}, long: ${marker.getPosition().lng()}`);
+
+                  infoWindow.close();
+                  infoWindow = new google.maps.InfoWindow({
+                      position: marker.getPosition(),
+                  });
+                  infoWindow.setContent("Splitter: 1/4\r\nUsed: 2\r\n");
+                  infoWindow.open(map);
+
+                  drawLines.push(marker.getPosition());
+                  distanceList.push(marker.getPosition());
+                  if (drawLines.length > 1) {
+                      drawLine(drawLines, map);
+                  }
+
+                  if (distanceList.length == 2) {
+                      calcDistance(distanceList);
+                  }
+              });
+          })(marker)
+      }
+
+      function generateOTP(){
+          var digits ='0123456789';
+          let OTP = '';
+          for(let i = 0; i < 2; i++){
+              OTP += digits[Math.floor(Math.random()*10)]
+          }
+          return OTP;
+      }
+      console.log(generateOTP())
+
+
+
+      // map.addListener("click", (event) => {
+      //     console.log(event.latLng);
+      //     console.log(`lat: ${event.latLng.lat()}, long: ${event.latLng.lng()}`);
+      //     markerList.push(event.latLng);
+      //     if (markerList.length == 2) {
+      //         calcDistance(markerList);
+      //     }
+      //     placeMarker(event.latLng, map);
+      // });
+
+      // google.maps.event.addListener(marker, "dragend", () => {
+      //     console.log(marker.getPosition());
+      //     console.log(`lat: ${marker.getPosition().lat()}, long: ${marker.getPosition().lng()}`);
+
+      // });
+
+      // bermudaTriangle.setMap(map);
+
+
+  }

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static',filename='favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ url_for('static',filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap-5.2.0-beta1-dist/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='fontawesome-free-6.1.2-web/css/all.min.css') }}">
+    <title>Add Roles</title>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row flex-nowrap">
+            <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
+                <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
+                    <a href="/" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                        <span class="fs-5 d-none d-sm-inline py-1"><h2>ADMIN</h2></span>
+                    </a>
+                    <hr class="dropdown-divider">
+                    <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
+                        <li class="nav-item">
+                            <a href="/" class="nav-link align-middle px-0" aria-current="page">
+                                <i class="fa-solid fa-house"></i> <span class="ms-1 d-none d-sm-inline">Home</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/loss_threshold" class="nav-link px-0 align-middle">
+                                <i class="fa-solid fa-chart-simple"></i> <span class="ms-1 d-none d-sm-inline">เกณฑ์ค่ามาตรฐาน</span></a>
+                        </li>
+                        <li>
+                            <a href="/olt_power" class="nav-link px-0 align-middle">
+                                <i class="fa-solid fa-bolt"></i> <span class="ms-1 d-none d-sm-inline">olt power</span> </a>
+                        </li>
+                        <li class="w-100">
+                            <a href="#submenu2" data-bs-toggle="collapse" class="nav-link px-auto align-middle active">
+                                <i class="fa-solid fa-users"></i> <span class="ms-1 d-none d-sm-inline">ผู้ใช้งาน</span></a>
+                            <ul class="collapse nav flex-column ms-1 align-items-center" id="submenu2" data-bs-parent="#menu">
+                                <li class="w-100">
+                                    <a href="/register" class="nav-link px-0"> <i class="fa-solid fa-user-plus"></i><span class="d-none d-sm-inline"> เพิ่มผู้ใช้งาน</span></a>
+                                </li>
+                                <li class="w-100">
+                                    <a href="/add_role" class="nav-link px-0"> <i class="fa-solid fa-user-gear"></i><u><span class="d-none d-sm-inline"> กำหนดสิทธิ์ผู้ใช้งาน</span></u></a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#submenu3" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
+                                <i class="fa-solid fa-sitemap"></i> <span class="ms-1 d-none d-sm-inline">Splitter</span> </a>
+                                <ul class="collapse nav flex-column ms-1 align-items-center" id="submenu3" data-bs-parent="#menu">
+                                <li class="w-100">
+                                    <a href="/select_splitter" class="nav-link px-0"> <i class="fa-solid fa-pen"></i> <span class="d-none d-sm-inline">Edit</span> </a>
+                                </li>
+                                <li class="w-100">
+                                    <a href="/add_splitter" class="nav-link px-0"> <i class="fa-solid fa-plus"></i> <span class="d-none d-sm-inline">Add</span></a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="#submenu4" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
+                                <i class="fa-solid fa-map-location-dot"></i> <span class="ms-1 d-none d-sm-inline">Marker</span> </a>
+                                <ul class="collapse nav flex-column ms-1 align-items-center" id="submenu4" data-bs-parent="#menu">
+                                <li class="w-100">
+                                    <a href="/select_marker" class="nav-link px-0"> <i class="fa-solid fa-compass-drafting"></i> <span class="d-none d-sm-inline">Edit</span> </a>
+                                </li>
+                                <li class="w-100">
+                                    <a href="/add_marker" class="nav-link px-0"> <i class="fa-solid fa-plus"></i> <span class="d-none d-sm-inline">Add</span></a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        
+                    </ul>
+                    <hr class="dropdown-divider">
+                    <div class="dropdown pb-4">
+                        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                            <!-- <img src="https://github.com/mdo.png" alt="hugenerd" width="30" height="30" class="rounded-circle"> -->
+                            <i class="fa-solid fa-user-gear"></i> 
+                            <span class="d-none d-sm-inline mx-1">{{ user['fname'] }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                            <li><a class="dropdown-item" href="#">New project...</a></li>
+                            <li><a class="dropdown-item" href="#">Settings</a></li>
+                            <li><a class="dropdown-item" href="#">Profile</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+             <div class="col py-3">
+                <form action="/add_role" method="post">
+                    <label for="users">Users</label>
+                    <input list="users" name="user" id="user"><br>
+            
+                    <datalist id="users" >
+                        {% for user in users %}
+                        <option value="{{ user['user_id'] }}">{{ user['fname'] }}</option>
+                        {% endfor %}
+                    </datalist>
+            
+                    <label for="roles">Role</label>
+                    <select name="role" id="role">
+                        {% for role in roles %}
+                        <option value="{{ role['role_id'] }}">{{ role['role_name'] }}</option>
+                        {% endfor %}
+                    </select>
+            
+                    <button type="submit">ADD</button>
+                </form>
+                <!-- <h3>ยินดีต้อนรับ {{ user['fname'] }}</h3>
+                <p class="lead">
+                    An example 2-level sidebar with collasible menu items. The menu functions like an "accordion" where only a single 
+                    menu is be open at a time. While the sidebar itself is not toggle-able, it does responsively shrink in width on smaller screens.</p>
+                <ul class="list-unstyled">
+                    <li><h5>Responsive</h5> shrinks in width, hides text labels and collapses to icons only on mobile</li>
+                </ul> -->
+            </div> 
+        </div>
+    </div>
+    <script src="{{ url_for('static',filename='bootstrap-5.2.0-beta1-dist/js/bootstrap.bundle.min.js') }}"></script>
+    
+</body>
+
+</html>

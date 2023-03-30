@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static',filename='favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ url_for('static',filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap-5.2.0-beta1-dist/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='fontawesome-free-6.1.2-web/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}">
+    <title>BFT : Threshold</title>
+</head>
+<style>
+    h1 {
+        text-align: center;
+        font-size:1.5cm ;
+    }
+
+    div {
+        text-align: center;
+    }
+    label{
+        font-size: 1.1cm;
+        font:bold;
+    }
+</style>
+
+<body>
+    <header>
+        <div class="row justify-content-between bg-white py-3">
+            <div class="col-4"></div>
+            <div class="col-4 d-flex justify-content-center">
+                <a class="navbar-brand" href="http://research.ntplc.co.th/">
+                    <img src="{{ url_for('static',filename='img/logo.jpg') }}" alt="" width="80" height="55"
+                        class="d-inline-block align-text-top">
+                </a>
+            </div>
+            <div class="col-4 d-flex justify-content-end">
+                <div class="dropdown">
+
+                    {% if user['fname'] == "admin" %}
+                    <button class="btn btn-outline-danger dropdown-toggle me-3" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false"><i class="fa-regular fa-circle-user"></i> {{ user['fname'] }}</button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/history"><i class="fa-solid fa-address-book"></i>
+                                DataBase</a></li>
+                        <li><a a class="dropdown-item" href="/select_splitter"><i class="fa-solid fa-wrench"></i> Edit
+                                Spiltter</a></li>
+                        <li><a class="dropdown-item" href="/edit_olt"><i class="fa-solid fa-plug-circle-bolt"></i> Edit
+                                OLT Power</a></li>
+                        <li><a class="dropdown-item" href="/edit_threshold"><i class="fa-solid fa-explosion"></i> Edit
+                                Loss Budget Threshold</a></li>
+                        {% elif user['fname'] != "admin" %}
+                        <button class="btn btn-outline-warning dropdown-toggle me-3" type="button"
+                            data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-regular fa-circle-user"></i> {{
+                            user['fname'] }}</button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/history"><i class="fa-solid fa-address-book"></i>
+                                    History</a></li>
+                            <li><a class="dropdown-item" href="/edit_profile"><i class="fa-solid fa-user-pen"></i> Edit
+                                    Profile</a></li>
+                            {% endif %}
+                            <li><a class="dropdown-item" href="/logout"><i
+                                        class="fa-solid fa-arrow-right-from-bracket"></i>
+                                    Logout</a></li>
+                        </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="row my-5">
+            <div class="col-auto mx-auto p-5 border shadow rounded-4 bg-purple2">
+                <div class="d-flex justify-content-between">
+                    <div class="me-0">
+                        <a onclick="history.back()" class="btn btn-outline-danger rounded-2" style="font-size: 0.75cm;" ><i
+                                class="fa-solid fa-reply"></i></a>
+                    </div>
+                    <div class="">
+                        <h1 class="text-dark">Loss Threshold</h1>
+                    </div>
+                    <div class=""></div>
+                </div><br>
+
+
+              
+<!-- -------------------------------------------------- -->
+                <div class="row row-cols-1 row-cols-md-3 g-3">
+                    <div class="col">
+                      <div class="card h-100 ">
+                        <!-- <img src="{{ url_for('static',filename='img/pass.gif') }}" width="50" height="180" class="card-img-top" alt="..."> -->
+                        <div class="card-body">
+                            <label for="Success">Pass</label>
+                          <h1 class="card-title text-success">{{ threshold_old['threshold_success'] }}<small class="text-muted-success fw-lighter"> dBm.</small></h1>
+                          <p class="card-text">เป็นค่าที่สามารถใช้งานได้</p>
+                        </div>
+                        <div class="card-footer  bg-card-purple">
+                          <small class="text-muted"><h6 class="text-light">Last updated : {{ threshold_old['threshold_dt'].strftime('%d-%m-%Y (%H:%M)') }}</h6></small>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="card h-100">
+                        <!-- <img src="{{ url_for('static',filename='img/warning.gif') }}" width="50" height="180" class="card-img-top" alt="..."> -->
+                        <div class="card-body">
+                            <label for="Warning">Warning</label>
+                          <h1 class="card-title text-warning">{{ threshold_old['threshold_warning'] }}<small class="text-muted-warning fw-lighter"> dBm.</small></h1>
+                          <p class="card-text">เป็นค่าที่สามารถใช้งานได้เช่นกัน แต่อาจจะมีความเสี่ยงที่จะมีปัญหาตามหลัง เนื่องการเป็นที่ใกล้จุดวิกฤตที่เกินมาตรฐาน</p>
+                        </div>
+                        <div class="card-footer  bg-card-purple">
+                          <small class="text-muted"><h6 class="text-light">Last updated : {{ threshold_old['threshold_dt'].strftime('%d-%m-%Y (%H:%M)') }}</h6></small>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col ">
+                      <div class="card h-100">
+                        <!-- <img src="{{ url_for('static',filename='img/over.gif') }}" width="50" height="180" class="card-img-top" alt="..."> -->
+                        <div class="card-body">
+                            <label for="Danger">Over</label>
+                          <h1 class="card-title text-danger">{{ threshold_old['threshold_danger'] }}<small class="text-muted-danger fw-lighter"> dBm.</small></h1>
+                          <p class="card-text">เป็นค่าที่ ONU ไม่สามารถทำงานได้ เนื่องจากไม่ได้เป็นไปตามมาครฐานที่รองรับการทำงาน</p>
+                        </div>
+                        <div class="card-footer  bg-card-purple">
+                          <small class="text-muted"><h6 class="text-light">Last updated : {{ threshold_old['threshold_dt'].strftime('%d-%m-%Y (%H:%M)') }}</h6></small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- --------------------------------------------------- -->        
+            </div>
+        </div>
+    </div>
+
+
+    <script src="{{ url_for('static',filename='bootstrap-5.2.0-beta1-dist/js/bootstrap.bundle.min.js') }}"></script>
+</body>
+
+</html>

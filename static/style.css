@@ -1,0 +1,98 @@
+
+*{
+    -webkit-box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    box-sizing:border-box;
+}
+body {
+    background-color: #a1c4d8;
+}
+ img{
+    outline: none;
+    border: none;
+    transition: 0.5s;
+ }
+img:hover{
+    background: #836de2;
+    box-shadow: 0 0 5px #9a85f7;
+    box-shadow: 0 0 20px #a79dd1;
+    box-shadow: 0 0 70px #aea3e0;
+    box-shadow: 0 0 140px #9179fd;
+}
+.bg-purple {
+    background: #beb1f8;   
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    outline: none;
+    border: none;
+    transition: 0.5s;
+
+}
+
+.nav-purple{
+color: #8772e9;
+}
+.bg-purple:focus {
+    background: #8772e9;
+    color: whitesmoke;
+    box-shadow: 0 0 5px #6d4ff5;
+    box-shadow: 0 0 20px #6d4ff5;
+    box-shadow: 0 0 70px #6d4ff5;
+    box-shadow: 0 0 140px #9179fd;
+
+}
+.bg-purple2 {
+    background: #ffffff;
+    box-shadow: 0 8px 16px 0 rgba(97, 97, 97, 0.2), 0 6px 20px 0 rgba(97, 97, 97, 0.19);
+    outline: none;
+    border: none;
+    transition: 0.5s;
+
+}
+.btn-purple {
+    background: #b9aafc;
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    padding: 8px;
+    outline: none;
+    border: none;
+    transition: 0.5S;
+}
+
+.btn-purple:hover {
+    background: #856bfa;
+    cursor: pointer;
+    color: white;
+    box-shadow: 0 0 5px #6d4ff5;
+    box-shadow: 0 0 20px #6d4ff5;
+    box-shadow: 0 0 70px #6d4ff5;
+    box-shadow: 0 0 140px #9179fd;
+
+}
+
+.link-purple {
+    color: #9179fd;
+}
+
+.text-purple {
+    color: #9179fd;
+}
+
+.bg-card-purple{
+    background: #6e30d1b2;
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    padding: 8px;
+    outline: none;
+    border: none;
+    transition: 0.5S;
+}
+.bg-card-purple:hover{
+    background: #000000;
+    cursor: pointer;
+    box-shadow: 0 0 5px #4b30ff;
+    box-shadow: 0 0 20px #6d4ff5;
+    box-shadow: 0 0 70px #c126f0;
+    box-shadow: 0 0 140px #b13df5;
+
+}
+
+
+/* background-color: #70bfff; */
